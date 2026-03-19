@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Админ панел - Никола Гаћеша</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .admin-panel {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .button-group {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .button-group h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: clamp(1rem, 4vw, 1.2rem);
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 10px;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            border: none;
+            border-radius: 10px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 50px;
+            word-break: break-word;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            background: #0056b3;
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 600px) {
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            button {
+                padding: 15px 5px;
+                font-size: 14px;
+            }
+            
+            .admin-panel {
+                padding: 10px;
+            }
+        }
+        
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            background: #f8f9fa;
+        }
+        
+        .upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #0056b3;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: #28a745;
+            margin: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .available { background: #28a745; color: white; }
+        .reserved { background: #ffc107; color: black; }
+        .sold { background: #dc3545; color: white; }
+        
+        .artworks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .art-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .art-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .art-info {
+            padding: 15px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .quick-actions button {
+            padding: 8px 5px;
+            font-size: 12px;
+            min-height: 40px;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <div class="admin-panel">
+        <h1>⚙️ Никола Гаћеша - Админ панел</h1>
+        
+        <!-- Firebase конфигурација -->
+        <script>
+            const firebaseConfig = {
+                apiKey: "AIzaSyChwoEz9uKhj8FIONC_ms1syqGx_bQkc0A",
+                authDomain: "nikola-gacesa-gallery.firebaseapp.com",
+                projectId: "nikola-gacesa-gallery",
+                storageBucket: "nikola-gacesa-gallery.firebasestorage.app",
+                messagingSenderId: "813005317066",
+                appId: "1:813005317066:web:41c202273b851e42b16533",
+                measurementId: "G-9EZ8P096PK"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const storage = firebase.storage();
+            const auth = firebase.auth();
+        </script>
+
+        <!-- Login форма -->
+        <div id="loginSection" style="text-align: center; padding: 40px;">
+            <h2>🔐 Пријава за администраторе</h2>
+            <input type="email" id="loginEmail" placeholder="Email" style="width: 100%; max-width: 300px; padding: 12px; margin: 10px; border-radius: 10px; border: 1px solid #ddd;">
+            <input type="password" id="loginPassword" placeholder="Lozinka" style="width: 100%; max-width: 300px; padding: 12px; margin: 10px; border-radius: 10px; border: 1px solid #ddd;">
+            <button onclick="login()" style="width: 100%; max-width: 300px; padding: 12px; background: #007bff;">🔑 Prijavi se</button>
+            <p style="margin-top: 20px;">Kontaktirajte nas da dobijete pristup</p>
+        </div>
+
+        <!-- Admin панел (сакривен док се не пријави) -->
+        <div id="adminContent" style="display: none;">
+            <!-- ГРУПА 1: ДОДАВАЊЕ СЛИКА -->
+            <div class="button-group">
+                <h3>📤 Додај нови рад</h3>
+                <div class="upload-area" id="dropArea" onclick="document.getElementById('fileInput').click()">
+                    <p>🖼 Кликни или превуци слику овде</p>
+                    <p style="font-size: 12px; color: #666;">Подржани формати: JPG, PNG, GIF (max 10MB)</p>
+                    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleFileSelect(this.files)">
+                </div>
+                
+                <div id="uploadPreview" style="display: none; margin-top: 20px;">
+                    <img id="previewImage" style="max-width: 100%; max-height: 200px; border-radius: 10px;">
+                    
+                    <input type="text" id="artTitle" placeholder="Назив дела" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;">
+                    <input type="number" id="artPrice" placeholder="Цена у €" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;">
+                    <input type="text" id="artTechnique" placeholder="Техника (нпр. Уље на платну)" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;">
+                    <input type="text" id="artDimensions" placeholder="Димензије (нпр. 80x100cm)" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;">
+                    <textarea id="artDescription" placeholder="Опис дела" rows="3" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;"></textarea>
+                    
+                    <div class="status-buttons" style="display: flex; gap: 10px; margin: 10px 0;">
+                        <button onclick="setNewStatus('available')" class="available-btn" style="flex: 1;">🟢 Доступно</button>
+                        <button onclick="setNewStatus('reserved')" class="reserved-btn" style="flex: 1;">🟡 Резервисано</button>
+                        <button onclick="setNewStatus('sold')" class="sold-btn" style="flex: 1;">🔴 Продато</button>
+                    </div>
+                    
+                    <button onclick="uploadArtwork()" style="width: 100%; padding: 15px; background: #28a745;">📤 Објави рад</button>
+                </div>
+            </div>
+
+            <!-- ГРУПА 2: БРЗЕ АКЦИЈЕ -->
+            <div class="button-group">
+                <h3>⚡ Брзе акције</h3>
+                <div class="button-grid">
+                    <button onclick="refreshGallery()">🔄 Освежи галерију</button>
+                    <button onclick="sortByPrice()">💰 Сортирај по цени</button>
+                    <button onclick="sortByDate()">📅 Сортирај по датуму</button>
+                    <button onclick="filterAvailable()">🟢 Прикажи доступне</button>
+                    <button onclick="filterReserved()">🟡 Прикажи резервисане</button>
+                    <button onclick="filterSold()">🔴 Прикажи продате</button>
+                    <button onclick="showAll()">🖼 Све слике</button>
+                    <button onclick="exportData()">📤 Извези податке</button>
+                </div>
+            </div>
+
+            <!-- ГРУПА 3: МАСОВНЕ ИЗМЕНЕ -->
+            <div class="button-group">
+                <h3>💰 Масовне измене цена</h3>
+                <div class="button-grid">
+                    <button onclick="bulkIncrease10()">📈 +10% на све</button>
+                    <button onclick="bulkDecrease10()">📉 -10% на све</button>
+                    <button onclick="bulkSetStatus('available')">🟢 Све у Доступно</button>
+                    <button onclick="bulkSetStatus('reserved')">🟡 Све у Резервисано</button>
+                    <button onclick="bulkSetStatus('sold')">🔴 Све у Продато</button>
+                </div>
+            </div>
+
+            <!-- Листа радова -->
+            <div id="artworksList" class="artworks-grid">
+                <!-- Овде ће се учитати радови -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentStatus = 'available';
+        let selectedFile = null;
+
+        // Функција за пријаву
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('adminContent').style.display = 'block';
+                    loadArtworks();
+                })
+                .catch((error) => {
+                    alert('Грешка при пријави: ' + error.message);
+                });
+        }
+
+        // Функција за одабир статуса новог рада
+        function setNewStatus(status) {
+            currentStatus = status;
+        }
+
+        // Функција за обраду изабраног фајла
+        function handleFileSelect(files) {
+            if (files.length > 0) {
+                selectedFile = files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('uploadPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+
+        // Функција за отпремање рада
+        async function uploadArtwork() {
+            if (!selectedFile) {
+                alert('Изаберите слику прво!');
+                return;
+            }
+
+            const title = document.getElementById('artTitle').value;
+            const price = document.getElementById('artPrice').value;
+            const technique = document.getElementById('artTechnique').value;
+            const dimensions = document.getElementById('artDimensions').value;
+            const description = document.getElementById('artDescription').value;
+
+            if (!title || !price) {
+                alert('Унесите назив и цену!');
+                return;
+            }
+
+            try {
+                // Отпреми слику у Firebase Storage
+                const storageRef = storage.ref(`artworks/${Date.now()}_${selectedFile.name}`);
+                const snapshot = await storageRef.put(selectedFile);
+                const imageUrl = await snapshot.ref.getDownloadURL();
+
+                // Сачувај податке у Firestore
+                await db.collection('artworks').add({
+                    title: title,
+                    price: parseFloat(price),
+                    technique: technique || 'Непознато',
+                    dimensions: dimensions || 'Непознато',
+                    description: description || '',
+                    status: currentStatus,
+                    imageUrl: imageUrl,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    year: new Date().getFullYear()
+                });
+
+                alert('✅ Рад успешно објављен!');
+                
+                // Очисти форму
+                document.getElementById('uploadPreview').style.display = 'none';
+                document.getElementById('artTitle').value = '';
+                document.getElementById('artPrice').value = '';
+                document.getElementById('artTechnique').value = '';
+                document.getElementById('artDimensions').value = '';
+                document.getElementById('artDescription').value = '';
+                selectedFile = null;
+                
+                // Освежи листу
+                loadArtworks();
+            } catch (error) {
+                alert('Грешка: ' + error.message);
+            }
+        }
+
+        // Функција за учитавање радова
+        async function loadArtworks() {
+            const snapshot = await db.collection('artworks').orderBy('createdAt', 'desc').get();
+            const artworksList = document.getElementById('artworksList');
+            artworksList.innerHTML = '';
+
+            snapshot.forEach(doc => {
+                const art = doc.data();
+                const artId = doc.id;
+                
+                const card = document.createElement('div');
+                card.className = 'art-card';
+                
+                let statusClass = art.status === 'available' ? 'available' : 
+                                art.status === 'reserved' ? 'reserved' : 'sold';
+                
+                card.innerHTML = `
+                    <img src="${art.imageUrl}" alt="${art.title}">
+                    <div class="art-info">
+                        <h3>${art.title}</h3>
+                        <p>💰 €${art.price}</p>
+                        <p><span class="status-badge ${statusClass}">${art.status}</span></p>
+                        <p>📐 ${art.dimensions}</p>
+                        <p>🖌 ${art.technique}</p>
+                        <div class="quick-actions">
+                            <button onclick="updateStatus('${artId}', 'available')" class="available-btn">🟢 Д</button>
+                            <button onclick="updateStatus('${artId}', 'reserved')" class="reserved-btn">🟡 Р</button>
+                            <button onclick="updateStatus('${artId}', 'sold')" class="sold-btn">🔴 П</button>
+                            <button onclick="editPrice('${artId}', ${art.price})">💰 Цена</button>
+                            <button onclick="deleteArtwork('${artId}')">🗑 Бриши</button>
+                            <button onclick="editArtwork('${artId}')">✏️ Измени</button>
+                        </div>
+                    </div>
+                `;
+                artworksList.appendChild(card);
+            });
+        }
+
+        // Функција за ажурирање статуса
+        async function updateStatus(artId, status) {
+            await db.collection('artworks').doc(artId).update({ status: status });
+            loadArtworks();
+        }
+
+        // Функција за брисање рада
+        async function deleteArtwork(artId) {
+            if (confirm('Да ли сте сигурни да желите да обришете овај рад?')) {
+                await db.collection('artworks').doc(artId).delete();
+                loadArtworks();
+            }
+        }
+
+        // Функција за измену цене
+        async function editPrice(artId, currentPrice) {
+            const newPrice = prompt('Унесите нову цену у €:', currentPrice);
+            if (newPrice) {
+                await db.collection('artworks').doc(artId).update({ price: parseFloat(newPrice) });
+                loadArtworks();
+            }
+        }
+
+        // Остале функције
+        function refreshGallery() { loadArtworks(); }
+        function sortByPrice() { alert('Сортирање по цени (урадићемо касније)'); }
+        function sortByDate() { alert('Сортирање по датуму (урадићемо касније)'); }
+        function filterAvailable() { alert('Филтрирање доступних'); }
+        function filterReserved() { alert('Филтрирање резервисаних'); }
+        function filterSold() { alert('Филтрирање продатих'); }
+        function showAll() { loadArtworks(); }
+        function exportData() { alert('Извоз података'); }
+        function bulkIncrease10() { alert('Масовно повећање цена за 10%'); }
+        function bulkDecrease10() { alert('Масовно смањење цена за 10%'); }
+        function bulkSetStatus(status) { alert('Масовно постављање статуса на ' + status); }
+        function editArtwork(id) { alert('Измена детаља рада (ускоро)'); }
+
+        // Drag & drop подршка
+        const dropArea = document.getElementById('dropArea');
+        
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
+        
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('dragover');
+        });
+        
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+            handleFileSelect(e.dataTransfer.files);
+        });
+    </script>
+</body>
+</html>
