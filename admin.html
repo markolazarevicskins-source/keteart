@@ -107,11 +107,6 @@
             display: none;
         }
         
-        .upload-btn {
-            background: #28a745;
-            margin: 10px;
-        }
-        
         .status-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -172,16 +167,16 @@
     <div class="admin-panel">
         <h1>⚙️ Никола Гаћеша - Админ панел</h1>
         
-        <!-- Firebase конфигурација -->
+        <!-- Firebase конфигурација (НОВИ КЉУЧЕВИ) -->
         <script>
             const firebaseConfig = {
-                apiKey: "AIzaSyChwoEz9uKhj8FIONC_ms1syqGx_bQkc0A",
-                authDomain: "nikola-gacesa-gallery.firebaseapp.com",
-                projectId: "nikola-gacesa-gallery",
-                storageBucket: "nikola-gacesa-gallery.firebasestorage.app",
-                messagingSenderId: "813005317066",
-                appId: "1:813005317066:web:41c202273b851e42b16533",
-                measurementId: "G-9EZ8P096PK"
+                apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
+                authDomain: "nikola-gacesa-galerija.firebaseapp.com",
+                projectId: "nikola-gacesa-galerija",
+                storageBucket: "nikola-gacesa-galerija.firebasestorage.app",
+                messagingSenderId: "610040801324",
+                appId: "1:610040801324:web:8a721b63ee8f7689118989",
+                measurementId: "G-TTM617837N"
             };
 
             firebase.initializeApp(firebaseConfig);
@@ -220,9 +215,9 @@
                     <textarea id="artDescription" placeholder="Опис дела" rows="3" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;"></textarea>
                     
                     <div class="status-buttons" style="display: flex; gap: 10px; margin: 10px 0;">
-                        <button onclick="setNewStatus('available')" class="available-btn" style="flex: 1;">🟢 Доступно</button>
-                        <button onclick="setNewStatus('reserved')" class="reserved-btn" style="flex: 1;">🟡 Резервисано</button>
-                        <button onclick="setNewStatus('sold')" class="sold-btn" style="flex: 1;">🔴 Продато</button>
+                        <button onclick="setNewStatus('available')" style="flex: 1; background: #28a745;">🟢 Доступно</button>
+                        <button onclick="setNewStatus('reserved')" style="flex: 1; background: #ffc107; color: black;">🟡 Резервисано</button>
+                        <button onclick="setNewStatus('sold')" style="flex: 1; background: #dc3545;">🔴 Продато</button>
                     </div>
                     
                     <button onclick="uploadArtwork()" style="width: 100%; padding: 15px; background: #28a745;">📤 Објави рад</button>
@@ -360,53 +355,64 @@
 
         // Функција за учитавање радова
         async function loadArtworks() {
-            const snapshot = await db.collection('artworks').orderBy('createdAt', 'desc').get();
-            const artworksList = document.getElementById('artworksList');
-            artworksList.innerHTML = '';
+            try {
+                const snapshot = await db.collection('artworks').orderBy('createdAt', 'desc').get();
+                const artworksList = document.getElementById('artworksList');
+                artworksList.innerHTML = '';
 
-            snapshot.forEach(doc => {
-                const art = doc.data();
-                const artId = doc.id;
-                
-                const card = document.createElement('div');
-                card.className = 'art-card';
-                
-                let statusClass = art.status === 'available' ? 'available' : 
-                                art.status === 'reserved' ? 'reserved' : 'sold';
-                
-                card.innerHTML = `
-                    <img src="${art.imageUrl}" alt="${art.title}">
-                    <div class="art-info">
-                        <h3>${art.title}</h3>
-                        <p>💰 €${art.price}</p>
-                        <p><span class="status-badge ${statusClass}">${art.status}</span></p>
-                        <p>📐 ${art.dimensions}</p>
-                        <p>🖌 ${art.technique}</p>
-                        <div class="quick-actions">
-                            <button onclick="updateStatus('${artId}', 'available')" class="available-btn">🟢 Д</button>
-                            <button onclick="updateStatus('${artId}', 'reserved')" class="reserved-btn">🟡 Р</button>
-                            <button onclick="updateStatus('${artId}', 'sold')" class="sold-btn">🔴 П</button>
-                            <button onclick="editPrice('${artId}', ${art.price})">💰 Цена</button>
-                            <button onclick="deleteArtwork('${artId}')">🗑 Бриши</button>
-                            <button onclick="editArtwork('${artId}')">✏️ Измени</button>
+                snapshot.forEach(doc => {
+                    const art = doc.data();
+                    const artId = doc.id;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'art-card';
+                    
+                    let statusClass = art.status === 'available' ? 'available' : 
+                                    art.status === 'reserved' ? 'reserved' : 'sold';
+                    
+                    card.innerHTML = `
+                        <img src="${art.imageUrl}" alt="${art.title}">
+                        <div class="art-info">
+                            <h3>${art.title}</h3>
+                            <p>💰 €${art.price}</p>
+                            <p><span class="status-badge ${statusClass}">${art.status}</span></p>
+                            <p>📐 ${art.dimensions || ''}</p>
+                            <p>🖌 ${art.technique || ''}</p>
+                            <div class="quick-actions">
+                                <button onclick="updateStatus('${artId}', 'available')" style="background: #28a745;">🟢 Д</button>
+                                <button onclick="updateStatus('${artId}', 'reserved')" style="background: #ffc107; color: black;">🟡 Р</button>
+                                <button onclick="updateStatus('${artId}', 'sold')" style="background: #dc3545;">🔴 П</button>
+                                <button onclick="editPrice('${artId}', ${art.price})" style="background: #17a2b8;">💰 Цена</button>
+                                <button onclick="deleteArtwork('${artId}')" style="background: #dc3545;">🗑 Бриши</button>
+                            </div>
                         </div>
-                    </div>
-                `;
-                artworksList.appendChild(card);
-            });
+                    `;
+                    artworksList.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Greška pri učitavanju:", error);
+            }
         }
 
         // Функција за ажурирање статуса
         async function updateStatus(artId, status) {
-            await db.collection('artworks').doc(artId).update({ status: status });
-            loadArtworks();
+            try {
+                await db.collection('artworks').doc(artId).update({ status: status });
+                loadArtworks();
+            } catch (error) {
+                alert('Greška: ' + error.message);
+            }
         }
 
         // Функција за брисање рада
         async function deleteArtwork(artId) {
             if (confirm('Да ли сте сигурни да желите да обришете овај рад?')) {
-                await db.collection('artworks').doc(artId).delete();
-                loadArtworks();
+                try {
+                    await db.collection('artworks').doc(artId).delete();
+                    loadArtworks();
+                } catch (error) {
+                    alert('Greška: ' + error.message);
+                }
             }
         }
 
@@ -414,42 +420,46 @@
         async function editPrice(artId, currentPrice) {
             const newPrice = prompt('Унесите нову цену у €:', currentPrice);
             if (newPrice) {
-                await db.collection('artworks').doc(artId).update({ price: parseFloat(newPrice) });
-                loadArtworks();
+                try {
+                    await db.collection('artworks').doc(artId).update({ price: parseFloat(newPrice) });
+                    loadArtworks();
+                } catch (error) {
+                    alert('Greška: ' + error.message);
+                }
             }
         }
 
-        // Остале функције
+        // Помоћне функције
         function refreshGallery() { loadArtworks(); }
-        function sortByPrice() { alert('Сортирање по цени (урадићемо касније)'); }
-        function sortByDate() { alert('Сортирање по датуму (урадићемо касније)'); }
-        function filterAvailable() { alert('Филтрирање доступних'); }
-        function filterReserved() { alert('Филтрирање резервисаних'); }
-        function filterSold() { alert('Филтрирање продатих'); }
+        function sortByPrice() { alert('Функција у развоју'); }
+        function sortByDate() { alert('Функција у развоју'); }
+        function filterAvailable() { alert('Функција у развоју'); }
+        function filterReserved() { alert('Функција у развоју'); }
+        function filterSold() { alert('Функција у развоју'); }
         function showAll() { loadArtworks(); }
-        function exportData() { alert('Извоз података'); }
-        function bulkIncrease10() { alert('Масовно повећање цена за 10%'); }
-        function bulkDecrease10() { alert('Масовно смањење цена за 10%'); }
-        function bulkSetStatus(status) { alert('Масовно постављање статуса на ' + status); }
-        function editArtwork(id) { alert('Измена детаља рада (ускоро)'); }
+        function exportData() { alert('Функција у развоју'); }
+        function bulkIncrease10() { alert('Функција у развоју'); }
+        function bulkDecrease10() { alert('Функција у развоју'); }
+        function bulkSetStatus(status) { alert('Функција у развоју'); }
 
         // Drag & drop подршка
         const dropArea = document.getElementById('dropArea');
-        
-        dropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropArea.classList.add('dragover');
-        });
-        
-        dropArea.addEventListener('dragleave', () => {
-            dropArea.classList.remove('dragover');
-        });
-        
-        dropArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropArea.classList.remove('dragover');
-            handleFileSelect(e.dataTransfer.files);
-        });
+        if (dropArea) {
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('dragover');
+            });
+            
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('dragover');
+            });
+            
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+                handleFileSelect(e.dataTransfer.files);
+            });
+        }
     </script>
 </body>
 </html>
