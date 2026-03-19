@@ -1,49 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin - Nikola Gacesa</title>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial; padding: 20px; background: #f0f2f5; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
-        input, textarea { width: 100%; padding: 10px; margin: 10px 0; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-        #preview { max-width: 100%; margin: 10px 0; display: none; }
-        .art-card { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
-    </style>
-    
+    <title>Nikola Gacesa - Admin</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Nikola Gacesa - Admin</h1>
-        
-        <div id="loginBox">
-            <h3>Prijava</h3>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Lozinka">
-            <button onclick="login()">Prijavi se</button>
-        </div>
-        
-        <div id="adminBox" style="display: none;">
-            <h3>Dodaj novi rad</h3>
-            <input type="file" id="slika" accept="image/*" onchange="prikaziSliku(this)">
-            <img id="preview" src="#">
-            
-            <input type="text" id="naslov" placeholder="Naslov">
-            <input type="number" id="cena" placeholder="Cena">
-            <button onclick="sacuvaj()">SACUVAJ RAD</button>
-            
-            <hr>
-            <h3>Postojeci radovi</h3>
-            <div id="listaRadova"></div>
-        </div>
+    <div id="login">
+        <input id="email" placeholder="Email"><br>
+        <input id="pass" type="password" placeholder="Lozinka"><br>
+        <button onclick="login()">Prijava</button>
+    </div>
+
+    <div id="admin" style="display:none">
+        <input type="file" id="slika" onchange="pretvoriUSliku(this)"><br>
+        <img id="preview" style="max-width:300px; display:none"><br>
+        <input id="naslov" placeholder="Naslov"><br>
+        <input id="cena" type="number" placeholder="Cena"><br>
+        <button onclick="sacuvaj()">SACUVAJ</button>
+        <div id="lista"></div>
     </div>
 
     <script>
-        // Firebase podesavanja
         const firebaseConfig = {
             apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
             authDomain: "nikola-gacesa-galerija.firebaseapp.com",
@@ -53,33 +32,28 @@
             appId: "1:610040801324:web:8a721b63ee8f7689118989"
         };
 
-        // Inicijalizacija
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         
-        let base64Slika = "";
+        let slikaBase64 = "";
 
-        // Login funkcija
         function login() {
-            let email = document.getElementById('email').value;
-            let pass = document.getElementById('password').value;
-            
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(() => {
-                    document.getElementById('loginBox').style.display = 'none';
-                    document.getElementById('adminBox').style.display = 'block';
-                    ucitajRadove();
-                })
-                .catch(err => alert("Greska: " + err.message));
+            auth.signInWithEmailAndPassword(
+                document.getElementById('email').value,
+                document.getElementById('pass').value
+            ).then(() => {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('admin').style.display = 'block';
+                ucitaj();
+            }).catch(e => alert(e.message));
         }
 
-        // Prikaz slike i konverzija u base64
-        function prikaziSliku(input) {
-            if (input.files && input.files[0]) {
+        function pretvoriUSliku(input) {
+            if (input.files[0]) {
                 let reader = new FileReader();
-                reader.onload = function(e) {
-                    base64Slika = e.target.result;
+                reader.onload = e => {
+                    slikaBase64 = e.target.result;
                     document.getElementById('preview').src = e.target.result;
                     document.getElementById('preview').style.display = 'block';
                 };
@@ -87,67 +61,34 @@
             }
         }
 
-        // Cuvanje rada
         async function sacuvaj() {
-            if (!base64Slika) {
-                alert("Izaberi sliku!");
-                return;
-            }
-            
-            let naslov = document.getElementById('naslov').value;
-            let cena = document.getElementById('cena').value;
-            
-            if (!naslov || !cena) {
-                alert("Unesi naslov i cenu!");
+            if (!slikaBase64 || !document.getElementById('naslov').value || !document.getElementById('cena').value) {
+                alert("Popuni sve!");
                 return;
             }
             
             try {
-                await db.collection('artworks').add({
-                    naslov: naslov,
-                    cena: Number(cena),
-                    slika: base64Slika,
-                    vreme: new Date().getTime()
+                await db.collection('radovi').add({
+                    slika: slikaBase64,
+                    naslov: document.getElementById('naslov').value,
+                    cena: Number(document.getElementById('cena').value),
+                    vreme: Date.now()
                 });
-                
-                alert("Rad sacuvan!");
-                
-                // Reset
-                document.getElementById('naslov').value = '';
-                document.getElementById('cena').value = '';
-                document.getElementById('preview').style.display = 'none';
-                base64Slika = '';
-                
-                ucitajRadove();
-            } catch (err) {
-                alert("GRESKA: " + err.message);
+                alert("OK");
+                location.reload();
+            } catch (e) {
+                alert("GRESKA: " + e.message);
             }
         }
 
-        // Ucitavanje radova
-        async function ucitajRadove() {
-            try {
-                let snapshot = await db.collection('artworks').orderBy('vreme').get();
-                let lista = document.getElementById('listaRadova');
-                lista.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    lista.innerHTML = '<p>Nema radova</p>';
-                    return;
-                }
-                
-                snapshot.forEach(doc => {
-                    let r = doc.data();
-                    lista.innerHTML += `
-                        <div class="art-card">
-                            <img src="${r.slika}" style="max-width: 100%; max-height: 200px;">
-                            <p><strong>${r.naslov}</strong> - ${r.cena}€</p>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                alert("Greska pri ucitavanju: " + err.message);
-            }
+        async function ucitaj() {
+            let html = "";
+            let snapshot = await db.collection('radovi').orderBy('vreme').get();
+            snapshot.forEach(doc => {
+                let r = doc.data();
+                html += `<div><img src="${r.slika}" style="max-width:200px"><br>${r.naslov} - ${r.cena}€</div><hr>`;
+            });
+            document.getElementById('lista').innerHTML = html;
         }
     </script>
 </body>
