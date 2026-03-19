@@ -23,7 +23,6 @@
         .art-info { padding: 20px; }
         .art-title { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; color: #333; }
         .art-price { font-size: 1.5em; color: #007bff; font-weight: bold; margin: 10px 0; }
-        .art-details { color: #666; font-size: 0.9em; margin: 10px 0; }
         .loading { text-align: center; color: white; font-size: 1.5em; padding: 50px; }
         .no-artworks { text-align: center; color: white; font-size: 1.5em; padding: 50px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 20px; }
     </style>
@@ -35,6 +34,10 @@
         <h1>🎨 НИКОЛА ГАЋЕША</h1>
         <p>Уметничка галерија и продавница</p>
     </header>
+
+    <nav>
+        <button onclick="window.location.reload()">🔄 Освежи</button>
+    </nav>
 
     <main id="gallery">
         <div class="loading">🔄 Учитавање радова...</div>
@@ -55,6 +58,7 @@
 
         async function ucitajRadove() {
             try {
+                // Uzmi SVE iz kolekcije 'radovi' (ne 'artworks')
                 const snapshot = await db.collection('radovi').orderBy('vreme', 'desc').get();
                 const gallery = document.getElementById('gallery');
                 
@@ -68,21 +72,24 @@
                     const r = doc.data();
                     const card = document.createElement('div');
                     card.className = 'art-card';
+                    
+                    // Prikaz slike, naslova i cene
                     card.innerHTML = `
-                        <img src="${r.slika}" alt="${r.naslov}" loading="lazy">
+                        <img src="${r.slika}" alt="${r.naslov || 'Bez naslova'}" loading="lazy">
                         <div class="art-info">
-                            <h3 class="art-title">${r.naslov}</h3>
-                            <div class="art-price">€${r.cena}</div>
+                            <h3 class="art-title">${r.naslov || 'Bez naslova'}</h3>
+                            <div class="art-price">€${r.cena || 0}</div>
                         </div>
                     `;
                     gallery.appendChild(card);
                 });
             } catch (error) {
                 console.error("Greška:", error);
-                document.getElementById('gallery').innerHTML = '<div class="no-artworks">❌ Грешка при учитавању</div>';
+                document.getElementById('gallery').innerHTML = '<div class="no-artworks">❌ Грешка при учитавању: ' + error.message + '</div>';
             }
         }
 
+        // Učitaj radove čim se stranica učita
         window.onload = ucitajRadove;
     </script>
 </body>
