@@ -1,391 +1,154 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html>
 <head>
+    <title>Admin - Nikola Gacesa</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ панел - Никола Гаћеша</title>
     <style>
-        /* (isti CSS kao u prethodnoj poruci - ne menjaj) */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-        }
-
-        .admin-panel {
-            background: white;
-            max-width: 1200px;
-            margin: 0 auto;
-            border-radius: 20px;
-            padding: 20px;
-        }
-
-        h1 { color: #333; margin-bottom: 20px; }
-
-        .upload-area {
-            border: 3px dashed #007bff;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            margin: 20px 0;
-            background: #f0f8ff;
-            cursor: pointer;
-        }
-        .upload-area:hover { background: #e6f3ff; }
-
-        #fileInput { display: none; }
-
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        button {
-            padding: 12px 25px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        button:hover { background: #0056b3; }
-
-        .status-btn {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .available { background: #28a745; color: white; }
-        .reserved { background: #ffc107; color: black; }
-        .sold { background: #dc3545; color: white; }
-
-        .artworks-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .art-card {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            overflow: hidden;
-            background: white;
-        }
-        .art-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        .art-info { padding: 15px; }
-
-        .quick-actions {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .quick-actions button {
-            padding: 5px 10px;
-            font-size: 12px;
-            margin: 2px;
-        }
-
-        #preview {
-            max-width: 100%;
-            max-height: 300px;
-            margin: 20px 0;
-            display: none;
-            border-radius: 10px;
-        }
+        body { font-family: Arial; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #preview { max-width: 100%; margin: 10px 0; display: none; }
+        .art-card { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
     </style>
-
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <div class="admin-panel">
-        <h1>⚙️ Никола Гаћеша - Админ панел</h1>
-
-        <script>
-            // Tvoj novi Firebase config
-            const firebaseConfig = {
-                apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
-                authDomain: "nikola-gacesa-galerija.firebaseapp.com",
-                projectId: "nikola-gacesa-galerija",
-                storageBucket: "nikola-gacesa-galerija.firebasestorage.app",
-                messagingSenderId: "610040801324",
-                appId: "1:610040801324:web:8a721b63ee8f7689118989"
-            };
-
-            // Inicijalizacija Firebase-a
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            const auth = firebase.auth();
-
-            console.log("Firebase inicijalizovan");
-        </script>
-
-        <!-- Login sekcija -->
-        <div id="loginSection" style="text-align: center; padding: 40px;">
-            <h2>🔐 Prijava</h2>
-            <input type="email" id="loginEmail" placeholder="Email">
-            <input type="password" id="loginPassword" placeholder="Lozinka">
+    <div class="container">
+        <h1>Nikola Gacesa - Admin</h1>
+        
+        <div id="loginBox">
+            <h3>Prijava</h3>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Lozinka">
             <button onclick="login()">Prijavi se</button>
         </div>
-
-        <!-- Admin sekcija -->
-        <div id="adminSection" style="display: none;">
-            <!-- Upload forma -->
-            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-                <p>📸 Klikni ovde da izabereš sliku</p>
-                <p style="font-size: 14px; color: #666;">(JPG, PNG - max 1MB)</p>
-            </div>
-
-            <input type="file" id="fileInput" accept="image/*" onchange="previewImage(this)">
-
+        
+        <div id="adminBox" style="display: none;">
+            <h3>Dodaj novi rad</h3>
+            <input type="file" id="slika" accept="image/*" onchange="prikaziSliku(this)">
             <img id="preview" src="#">
-
-            <input type="text" id="title" placeholder="Naziv dela">
-            <input type="number" id="price" placeholder="Cena u €">
-            <input type="text" id="technique" placeholder="Tehnika (npr. Ulje na platnu)">
-            <input type="text" id="dimensions" placeholder="Dimenzije (npr. 80x100cm)">
-            <textarea id="description" placeholder="Opis" rows="3"></textarea>
-
-            <div style="margin: 20px 0;">
-                <button class="status-btn available" onclick="setStatus('available')">🟢 Dostupno</button>
-                <button class="status-btn reserved" onclick="setStatus('reserved')">🟡 Rezervisano</button>
-                <button class="status-btn sold" onclick="setStatus('sold')">🔴 Prodato</button>
-            </div>
-
-            <button onclick="uploadArtwork()" style="width: 100%; background: #28a745;">📤 Objavi rad</button>
-
-            <!-- Lista radova -->
-            <h2 style="margin-top: 40px;">Postojeći radovi</h2>
-            <div id="artworksList" class="artworks-grid"></div>
+            
+            <input type="text" id="naslov" placeholder="Naslov">
+            <input type="number" id="cena" placeholder="Cena">
+            <button onclick="sacuvaj()">SACUVAJ RAD</button>
+            
+            <hr>
+            <h3>Postojeci radovi</h3>
+            <div id="listaRadova"></div>
         </div>
     </div>
 
     <script>
-        let currentUser = null;
-        let currentStatus = 'available';
-        let selectedImageBase64 = '';
+        // Firebase podesavanja
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
+            authDomain: "nikola-gacesa-galerija.firebaseapp.com",
+            projectId: "nikola-gacesa-galerija",
+            storageBucket: "nikola-gacesa-galerija.firebasestorage.app",
+            messagingSenderId: "610040801324",
+            appId: "1:610040801324:web:8a721b63ee8f7689118989"
+        };
 
-        // Funkcija za login
+        // Inicijalizacija
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        let base64Slika = "";
+
+        // Login funkcija
         function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            console.log("Pokušaj logina za:", email);
-
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    console.log("Login uspešan");
-                    currentUser = userCredential.user;
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('adminSection').style.display = 'block';
-                    loadArtworks();
+            let email = document.getElementById('email').value;
+            let pass = document.getElementById('password').value;
+            
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => {
+                    document.getElementById('loginBox').style.display = 'none';
+                    document.getElementById('adminBox').style.display = 'block';
+                    ucitajRadove();
                 })
-                .catch((error) => {
-                    console.error("Greška pri loginu:", error);
-                    alert('Greška pri prijavi: ' + error.message);
-                });
+                .catch(err => alert("Greska: " + err.message));
         }
 
-        function setStatus(status) {
-            currentStatus = status;
-            console.log("Status postavljen na:", status);
-        }
-
-        // Funkcija za prikaz preview slike i konvertovanje u Base64
-        function previewImage(input) {
-            console.log("previewImage pozvana");
+        // Prikaz slike i konverzija u base64
+        function prikaziSliku(input) {
             if (input.files && input.files[0]) {
-                const file = input.files[0];
-                console.log("Fajl izabran:", file.name, "Veličina:", file.size);
-
-                if (file.size > 1024 * 1024) { // 1MB limit
-                    alert("Slika je prevelika. Maksimalna veličina je 1MB.");
-                    return;
-                }
-
-                const reader = new FileReader();
+                let reader = new FileReader();
                 reader.onload = function(e) {
-                    console.log("Fajl učitan, Base64 dužina:", e.target.result.length);
-                    selectedImageBase64 = e.target.result;
+                    base64Slika = e.target.result;
                     document.getElementById('preview').src = e.target.result;
                     document.getElementById('preview').style.display = 'block';
                 };
-                reader.onerror = function(error) {
-                    console.error("Greška pri čitanju fajla:", error);
-                    alert("Greška pri čitanju fajla.");
-                };
-                reader.readAsDataURL(file);
-            } else {
-                console.log("Nema izabranog fajla");
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // Glavna funkcija za upload
-        async function uploadArtwork() {
-            console.log("uploadArtwork pozvana");
+        // Cuvanje rada
+        async function sacuvaj() {
+            if (!base64Slika) {
+                alert("Izaberi sliku!");
+                return;
+            }
             
-            // Provera da li je slika izabrana
-            if (!selectedImageBase64) {
-                alert('Izaberi sliku prvo!');
+            let naslov = document.getElementById('naslov').value;
+            let cena = document.getElementById('cena').value;
+            
+            if (!naslov || !cena) {
+                alert("Unesi naslov i cenu!");
                 return;
             }
-
-            const title = document.getElementById('title').value;
-            const price = document.getElementById('price').value;
-
-            if (!title || !price) {
-                alert('Unesi naziv i cenu!');
-                return;
-            }
-
-            console.log("Podaci za upload:", { title, price, status: currentStatus });
-
+            
             try {
-                console.log("Pokušavam upis u Firestore...");
-                
-                // Probaj da upišeš u Firestore
-                const docRef = await db.collection('artworks').add({
-                    title: title,
-                    price: Number(price),
-                    technique: document.getElementById('technique').value || 'Nepoznato',
-                    dimensions: document.getElementById('dimensions').value || 'Nepoznato',
-                    description: document.getElementById('description').value || '',
-                    status: currentStatus,
-                    imageBase64: selectedImageBase64,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    year: new Date().getFullYear()
+                await db.collection('artworks').add({
+                    naslov: naslov,
+                    cena: Number(cena),
+                    slika: base64Slika,
+                    vreme: new Date().getTime()
                 });
-
-                console.log("Uspešno upisano! ID dokumenta:", docRef.id);
-                alert('✅ Rad uspešno objavljen!');
-
-                // Reset forme
-                document.getElementById('title').value = '';
-                document.getElementById('price').value = '';
-                document.getElementById('technique').value = '';
-                document.getElementById('dimensions').value = '';
-                document.getElementById('description').value = '';
+                
+                alert("Rad sacuvan!");
+                
+                // Reset
+                document.getElementById('naslov').value = '';
+                document.getElementById('cena').value = '';
                 document.getElementById('preview').style.display = 'none';
-                selectedImageBase64 = '';
-
-                // Osveži listu
-                await loadArtworks();
-                console.log("Lista osvežena");
-
-            } catch (error) {
-                console.error("GRESKA PRI UPLOADU:", error);
-                alert('Greška pri čuvanju: ' + error.message + '\n\nPogledaj konzolu (F12) za više detalja.');
+                base64Slika = '';
+                
+                ucitajRadove();
+            } catch (err) {
+                alert("GRESKA: " + err.message);
             }
         }
 
-        // Učitavanje postojećih radova
-        async function loadArtworks() {
-            console.log("loadArtworks pozvana");
+        // Ucitavanje radova
+        async function ucitajRadove() {
             try {
-                const snapshot = await db.collection('artworks').orderBy('createdAt', 'desc').get();
-                const list = document.getElementById('artworksList');
-                list.innerHTML = '';
-
+                let snapshot = await db.collection('artworks').orderBy('vreme').get();
+                let lista = document.getElementById('listaRadova');
+                lista.innerHTML = '';
+                
                 if (snapshot.empty) {
-                    console.log("Nema radova u bazi");
-                    list.innerHTML = '<p style="text-align: center;">Još uvek nema objavljenih radova.</p>';
+                    lista.innerHTML = '<p>Nema radova</p>';
                     return;
                 }
-
+                
                 snapshot.forEach(doc => {
-                    const art = doc.data();
-                    const id = doc.id;
-                    
-                    const card = document.createElement('div');
-                    card.className = 'art-card';
-                    
-                    card.innerHTML = `
-                        <img src="${art.imageBase64}" alt="${art.title}">
-                        <div class="art-info">
-                            <h3>${art.title}</h3>
-                            <p><strong>€${art.price}</strong></p>
-                            <p>${art.technique} | ${art.dimensions}</p>
-                            <p>Status: <span style="font-weight: bold;">${art.status}</span></p>
-                            <div class="quick-actions">
-                                <button onclick="updateStatus('${id}', 'available')" style="background: #28a745;">🟢</button>
-                                <button onclick="updateStatus('${id}', 'reserved')" style="background: #ffc107;">🟡</button>
-                                <button onclick="updateStatus('${id}', 'sold')" style="background: #dc3545;">🔴</button>
-                                <button onclick="deleteArtwork('${id}')" style="background: #dc3545;">🗑</button>
-                            </div>
+                    let r = doc.data();
+                    lista.innerHTML += `
+                        <div class="art-card">
+                            <img src="${r.slika}" style="max-width: 100%; max-height: 200px;">
+                            <p><strong>${r.naslov}</strong> - ${r.cena}€</p>
                         </div>
                     `;
-                    list.appendChild(card);
                 });
-                console.log("Radovi učitani, ukupno:", snapshot.size);
-            } catch (error) {
-                console.error("Greška pri učitavanju radova:", error);
-                alert('Greška pri učitavanju: ' + error.message);
+            } catch (err) {
+                alert("Greska pri ucitavanju: " + err.message);
             }
         }
-
-        // Update statusa
-        async function updateStatus(id, status) {
-            console.log("updateStatus za ID:", id, "na status:", status);
-            try {
-                await db.collection('artworks').doc(id).update({ status: status });
-                await loadArtworks();
-            } catch (error) {
-                console.error("Greška pri update statusa:", error);
-                alert('Greška: ' + error.message);
-            }
-        }
-
-        // Brisanje rada
-        async function deleteArtwork(id) {
-            if (confirm('Siguran?')) {
-                console.log("Brisanje ID:", id);
-                try {
-                    await db.collection('artworks').doc(id).delete();
-                    await loadArtworks();
-                } catch (error) {
-                    console.error("Greška pri brisanju:", error);
-                    alert('Greška: ' + error.message);
-                }
-            }
-        }
-
-        // Provera da li je Firestore dostupan
-        async function checkFirestore() {
-            try {
-                console.log("Provera Firestore konekcije...");
-                const test = await db.collection('artworks').limit(1).get();
-                console.log("Firestore konekcija OK");
-            } catch (error) {
-                console.error("Firestore konekcija NE RADI:", error);
-            }
-        }
-
-        // Pokreni proveru kad se učita stranica
-        window.onload = function() {
-            console.log("Stranica učitana");
-            checkFirestore();
-        };
     </script>
 </body>
 </html>
