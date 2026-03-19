@@ -1,244 +1,34 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html>
 <head>
+    <title>Nikola Gacesa - Slikar</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Никола Гаћеша - Сликар</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        header {
-            background: rgba(255,255,255,0.95);
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        header h1 {
-            font-size: 3em;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        @media (max-width: 600px) {
-            header h1 {
-                font-size: 2em;
-            }
-        }
-        
-        header p {
-            font-size: 1.2em;
-            color: #666;
-        }
-        
-        nav {
-            background: white;
-            padding: 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        nav button {
-            margin: 5px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            background: #f0f0f0;
-            color: #333;
-            font-size: 1em;
-            cursor: pointer;
-            transition: 0.3s;
-            display: inline-block;
-        }
-        
-        nav button:hover {
-            background: #007bff;
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        nav button.active {
-            background: #007bff;
-            color: white;
-        }
-        
-        #gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        @media (max-width: 600px) {
-            #gallery {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                padding: 20px;
-            }
-        }
-        
-        .art-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: 0.3s;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .art-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        
-        .art-card:active {
-            transform: scale(0.98);
-        }
-        
-        .art-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-        
-        @media (max-width: 600px) {
-            .art-image {
-                height: 250px;
-            }
-        }
-        
-        .art-info {
-            padding: 20px;
-        }
-        
-        .art-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .art-price {
-            font-size: 1.5em;
-            color: #007bff;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .art-status {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .status-available {
-            background: #28a745;
-            color: white;
-        }
-        
-        .status-reserved {
-            background: #ffc107;
-            color: black;
-        }
-        
-        .status-sold {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .art-details {
-            color: #666;
-            font-size: 0.9em;
-            margin: 10px 0;
-        }
-        
-        .art-details p {
-            margin: 5px 0;
-        }
-        
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 1.5em;
-            padding: 50px;
-        }
-        
-        .no-artworks {
-            text-align: center;
-            color: white;
-            font-size: 1.5em;
-            padding: 50px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin: 20px;
-        }
-        
-        /* Modal за детаље */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .modal-content {
-            background: white;
-            margin: 20px;
-            padding: 20px;
-            border-radius: 20px;
-            max-width: 600px;
-            position: relative;
-        }
-        
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 30px;
-            cursor: pointer;
-            color: #333;
-        }
-        
-        .modal img {
-            width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 10px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        header { background: rgba(255,255,255,0.95); padding: 40px 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        header h1 { font-size: 3em; color: #333; margin-bottom: 10px; }
+        @media (max-width: 600px) { header h1 { font-size: 2em; } }
+        header p { font-size: 1.2em; color: #666; }
+        nav { background: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; }
+        nav button { margin: 5px; padding: 10px 20px; border: none; border-radius: 25px; background: #f0f0f0; color: #333; font-size: 1em; cursor: pointer; transition: 0.3s; display: inline-block; }
+        nav button:hover { background: #007bff; color: white; }
+        #gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; padding: 40px; max-width: 1400px; margin: 0 auto; }
+        @media (max-width: 600px) { #gallery { grid-template-columns: 1fr; gap: 20px; padding: 20px; } }
+        .art-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.3s; cursor: pointer; }
+        .art-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .art-card img { width: 100%; height: 300px; object-fit: cover; background: #f0f0f0; }
+        @media (max-width: 600px) { .art-card img { height: 250px; } }
+        .art-info { padding: 20px; }
+        .art-title { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; color: #333; }
+        .art-price { font-size: 1.5em; color: #007bff; font-weight: bold; margin: 10px 0; }
+        .art-details { color: #666; font-size: 0.9em; margin: 10px 0; }
+        .loading { text-align: center; color: white; font-size: 1.5em; padding: 50px; }
+        .no-artworks { text-align: center; color: white; font-size: 1.5em; padding: 50px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 20px; }
     </style>
-    
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 </head>
 <body>
     <header>
@@ -246,202 +36,54 @@
         <p>Уметничка галерија и продавница</p>
     </header>
 
-    <nav>
-        <button onclick="filterArt('sve')" id="filterSve" class="active">🖼 Све слике</button>
-        <button onclick="filterArt('available')" id="filterAvailable">🟢 Доступно</button>
-        <button onclick="filterArt('reserved')" id="filterReserved">🟡 Резервисано</button>
-        <button onclick="filterArt('sold')" id="filterSold">🔴 Продато</button>
-        <button onclick="sortByPrice()">💰 Сортирај по цени</button>
-        <button onclick="sortByDate()">📅 Најновије прво</button>
-    </nav>
-
     <main id="gallery">
         <div class="loading">🔄 Учитавање радова...</div>
     </main>
 
-    <!-- Модал за детаље -->
-    <div id="artModal" class="modal" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="modalContent"></div>
-        </div>
-    </div>
-
     <script>
-        // Firebase конфигурација
         const firebaseConfig = {
-            apiKey: "AIzaSyChwoEz9uKhj8FIONC_ms1syqGx_bQkc0A",
-            authDomain: "nikola-gacesa-gallery.firebaseapp.com",
-            projectId: "nikola-gacesa-gallery",
-            storageBucket: "nikola-gacesa-gallery.firebasestorage.app",
-            messagingSenderId: "813005317066",
-            appId: "1:813005317066:web:41c202273b851e42b16533",
-            measurementId: "G-9EZ8P096PK"
+            apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
+            authDomain: "nikola-gacesa-galerija.firebaseapp.com",
+            projectId: "nikola-gacesa-galerija",
+            storageBucket: "nikola-gacesa-galerija.firebasestorage.app",
+            messagingSenderId: "610040801324",
+            appId: "1:610040801324:web:8a721b63ee8f7689118989"
         };
 
-        // Иницијализација Firebase-а
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        
-        let allArtworks = [];
-        let currentFilter = 'sve';
 
-        // Учитавање радова
-        async function loadArtworks() {
+        async function ucitajRadove() {
             try {
-                const snapshot = await db.collection('artworks').orderBy('createdAt', 'desc').get();
-                allArtworks = [];
-                snapshot.forEach(doc => {
-                    allArtworks.push({ id: doc.id, ...doc.data() });
-                });
-                displayGallery();
-            } catch (error) {
-                console.error("Грешка при учитавању:", error);
-                document.getElementById('gallery').innerHTML = '<div class="no-artworks">❌ Грешка при учитавању радова</div>';
-            }
-        }
-
-        // Приказ галерије
-        function displayGallery() {
-            const gallery = document.getElementById('gallery');
-            
-            let artworksToShow = allArtworks;
-            if (currentFilter !== 'sve') {
-                artworksToShow = allArtworks.filter(art => art.status === currentFilter);
-            }
-
-            if (artworksToShow.length === 0) {
-                gallery.innerHTML = '<div class="no-artworks">🖼 Тренутно нема радова у овој категорији</div>';
-                return;
-            }
-
-            gallery.innerHTML = '';
-            artworksToShow.forEach(art => {
-                const card = document.createElement('div');
-                card.className = 'art-card';
-                card.onclick = () => showArtDetails(art);
+                const snapshot = await db.collection('radovi').orderBy('vreme', 'desc').get();
+                const gallery = document.getElementById('gallery');
                 
-                let statusClass = '';
-                let statusText = '';
-                
-                switch(art.status) {
-                    case 'available':
-                        statusClass = 'status-available';
-                        statusText = '🟢 ДОСТУПНО';
-                        break;
-                    case 'reserved':
-                        statusClass = 'status-reserved';
-                        statusText = '🟡 РЕЗЕРВИСАНО';
-                        break;
-                    case 'sold':
-                        statusClass = 'status-sold';
-                        statusText = '🔴 ПРОДАТО';
-                        break;
-                    default:
-                        statusClass = 'status-available';
-                        statusText = '🟢 ДОСТУПНО';
+                if (snapshot.empty) {
+                    gallery.innerHTML = '<div class="no-artworks">🖼 Тренутно нема радова</div>';
+                    return;
                 }
 
-                card.innerHTML = `
-                    <img src="${art.imageUrl}" alt="${art.title}" class="art-image" loading="lazy">
-                    <div class="art-info">
-                        <h3 class="art-title">${art.title}</h3>
-                        <div class="art-price">€${art.price}</div>
-                        <div class="art-status ${statusClass}">${statusText}</div>
-                        <div class="art-details">
-                            <p>📐 ${art.dimensions || 'Непознато'}</p>
-                            <p>🖌 ${art.technique || 'Непознато'}</p>
-                            <p>📅 ${art.year || new Date().getFullYear()}</p>
+                gallery.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const r = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'art-card';
+                    card.innerHTML = `
+                        <img src="${r.slika}" alt="${r.naslov}" loading="lazy">
+                        <div class="art-info">
+                            <h3 class="art-title">${r.naslov}</h3>
+                            <div class="art-price">€${r.cena}</div>
                         </div>
-                    </div>
-                `;
-                gallery.appendChild(card);
-            });
-        }
-
-        // Приказ детаља
-        function showArtDetails(art) {
-            let statusClass = '';
-            let statusText = '';
-            
-            switch(art.status) {
-                case 'available':
-                    statusClass = 'status-available';
-                    statusText = '🟢 ДОСТУПНО';
-                    break;
-                case 'reserved':
-                    statusClass = 'status-reserved';
-                    statusText = '🟡 РЕЗЕРВИСАНО';
-                    break;
-                case 'sold':
-                    statusClass = 'status-sold';
-                    statusText = '🔴 ПРОДАТО';
-                    break;
-            }
-
-            const modalContent = document.getElementById('modalContent');
-            modalContent.innerHTML = `
-                <img src="${art.imageUrl}" alt="${art.title}">
-                <h2 style="margin: 20px 0 10px;">${art.title}</h2>
-                <div class="art-price" style="font-size: 2em;">€${art.price}</div>
-                <div class="art-status ${statusClass}" style="margin: 15px 0;">${statusText}</div>
-                <div style="line-height: 1.6;">
-                    <p><strong>📐 Димензије:</strong> ${art.dimensions || 'Непознато'}</p>
-                    <p><strong>🖌 Техника:</strong> ${art.technique || 'Непознато'}</p>
-                    <p><strong>📅 Година:</strong> ${art.year || 'Непознато'}</p>
-                    <p><strong>📝 Опис:</strong> ${art.description || 'Нема описа'}</p>
-                </div>
-            `;
-            
-            document.getElementById('artModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('artModal').style.display = 'none';
-        }
-
-        // Филтрирање
-        function filterArt(status) {
-            currentFilter = status;
-            
-            // Ажурирање активног дугмета
-            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-            if (status === 'sve') document.getElementById('filterSve').classList.add('active');
-            if (status === 'available') document.getElementById('filterAvailable').classList.add('active');
-            if (status === 'reserved') document.getElementById('filterReserved').classList.add('active');
-            if (status === 'sold') document.getElementById('filterSold').classList.add('active');
-            
-            displayGallery();
-        }
-
-        // Сортирање по цени
-        function sortByPrice() {
-            allArtworks.sort((a, b) => a.price - b.price);
-            displayGallery();
-        }
-
-        // Сортирање по датуму
-        function sortByDate() {
-            allArtworks.sort((a, b) => {
-                if (!a.createdAt) return 1;
-                if (!b.createdAt) return -1;
-                return b.createdAt.seconds - a.createdAt.seconds;
-            });
-            displayGallery();
-        }
-
-        // Клик ван модала затвара
-        window.onclick = function(event) {
-            const modal = document.getElementById('artModal');
-            if (event.target == modal) {
-                modal.style.display = "none";
+                    `;
+                    gallery.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Greška:", error);
+                document.getElementById('gallery').innerHTML = '<div class="no-artworks">❌ Грешка при учитавању</div>';
             }
         }
 
-        // Учитавање када се страница отвори
-        window.onload = function() {
-            loadArtworks();
-        };
+        window.onload = ucitajRadove;
     </script>
 </body>
 </html>
