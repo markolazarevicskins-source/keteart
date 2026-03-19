@@ -3,6 +3,9 @@
 <head>
     <title>Nikola Gacesa - Admin</title>
     <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
         body { font-family: Arial; padding: 20px; background: #f0f2f5; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
@@ -13,11 +16,6 @@
         .rad { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
         .rad img { max-width: 100%; max-height: 150px; }
     </style>
-    
-    <!-- PRAVI Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
     <div class="container">
@@ -49,7 +47,6 @@
     </div>
 
     <script>
-        // TVOJ Firebase config (ispravljen)
         const firebaseConfig = {
             apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
             authDomain: "nikola-gacesa-galerija.firebaseapp.com",
@@ -59,170 +56,12 @@
             appId: "1:610040801324:web:8a721b63ee8f7689118989"
         };
 
-        // Inicijalizacija Firebase-a
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();  // ISPRAVLJENO
-        const auth = firebase.auth();
-        
-        let slikaBase64 = "";
-
-        // Login funkcija
-        function login() {
-            let email = document.getElementById('email').value;
-            let pass = document.getElementById('password').value;
-            
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(() => {
-                    document.getElementById('loginBox').style.display = 'none';
-                    document.getElementById('adminBox').style.display = 'block';
-                    ucitajRadove();  // Učitaj radove posle logina
-                })
-                .catch(err => alert("Greška: " + err.message));
-        }
-
-        // Pretvori sliku u Base64
-        function pretvoriUSliku(input) {  // ISPRAVLJENO ime
-            if (input.files && input.files[0]) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    slikaBase64 = e.target.result;
-                    document.getElementById('preview').src = e.target.result;
-                    document.getElementById('preview').style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // Sačuvaj rad
-        async function sacuvaj() {  // ISPRAVLJENO ime
-            // Provera
-            if (!slikaBase64) {
-                alert("Izaberi sliku!");
-                return;
-            }
-            
-            let naslov = document.getElementById('naslov').value;
-            let cena = document.getElementById('cena').value;
-            
-            if (!naslov || !cena) {
-                alert("Unesi naslov i cenu!");
-                return;
-            }
-            
-            try {
-                // Upis u Firestore
-                await db.collection('radovi').add({
-                    naslov: naslov,
-                    cena: Number(cena),
-                    slika: slikaBase64,
-                    vreme: Date.now()
-                });
-                
-                alert("Rad uspešno sačuvan!");
-                
-                // Reset forme
-                document.getElementById('naslov').value = '';
-                document.getElementById('cena').value = '';
-                document.getElementById('preview').style.display = 'none';
-                slikaBase64 = '';
-                
-                // Osveži listu
-                ucitajRadove();
-                
-            } catch (error) {
-                alert("Greška: " + error.message);
-                console.error(error);
-            }
-        }
-
-        // Učitaj radove
-        async function ucitajRadove() {
-            try {
-                let snapshot = await db.collection('radovi').orderBy('vreme').get();
-                let lista = document.getElementById('lista');
-                lista.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    lista.innerHTML = '<p>Nema radova</p>';
-                    return;
-                }
-                
-                snapshot.forEach(doc => {
-                    let r = doc.data();
-                    lista.innerHTML += `
-                        <div class="rad">
-                            <img src="${r.slika}">
-                            <p><strong>${r.naslov}</strong> - ${r.cena}€</p>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Greška pri učitavanju:", error);
-            }
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html>
-<head>
-    <title>Admin</title>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
-        .box { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; }
-        #preview { max-width: 100%; display: none; margin: 10px 0; }
-    </style>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-</head>
-<body>
-    <div class="box">
-        <h2>Nikola Gacesa - Admin</h2>
-        
-        <div id="loginBox">
-            <h3>Prijava</h3>
-            <input type="email" id="email" placeholder="Email" value="nikola@gmail.com">
-            <input type="password" id="password" placeholder="Lozinka" value="Nikola2024">
-            <button onclick="login()">PRIJAVI SE</button>
-        </div>
-        
-        <div id="adminBox" style="display: none;">
-            <h3>Dodaj novi rad</h3>
-            <input type="file" id="slika" accept="image/*" onchange="prikaziSliku(this)">
-            <img id="preview">
-            
-            <input type="text" id="naslov" placeholder="Naslov">
-            <input type="number" id="cena" placeholder="Cena">
-            
-            <button onclick="sacuvaj()" style="background: #28a745; color: white;">SAČUVAJ RAD</button>
-            
-            <hr>
-            <h3>Postojeći radovi</h3>
-            <div id="lista"></div>
-        </div>
-    </div>
-
-    <script>
-        // Firebase podesavanja
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
-            authDomain: "nikola-gacesa-galerija.firebaseapp.com",
-            projectId: "nikola-gacesa-galerija",
-            storageBucket: "nikola-gacesa-galerija.firebasestorage.app",
-            messagingSenderId: "610040801324",
-            appId: "1:610040801324:web:8a721b63ee8f7689118989"
-        };
-
-        // Inicijalizacija
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         
         let slikaBase64 = "";
 
-        // Login
         function login() {
             let email = document.getElementById('email').value;
             let pass = document.getElementById('password').value;
@@ -233,13 +72,10 @@
                     document.getElementById('adminBox').style.display = 'block';
                     ucitajRadove();
                 })
-                .catch(err => {
-                    alert("GREŠKA: " + err.message);
-                });
+                .catch(err => alert("Greška: " + err.message));
         }
 
-        // Prikaz slike
-        function prikaziSliku(input) {
+        function pretvoriUSliku(input) {
             if (input.files && input.files[0]) {
                 let reader = new FileReader();
                 reader.onload = function(e) {
@@ -251,72 +87,39 @@
             }
         }
 
-        // Sacuvaj rad
         async function sacuvaj() {
-            // Provera
-            if (!slikaBase64) {
-                alert("Izaberi sliku!");
-                return;
-            }
-            
+            if (!slikaBase64) { alert("Izaberi sliku!"); return; }
             let naslov = document.getElementById('naslov').value;
             let cena = document.getElementById('cena').value;
-            
-            if (!naslov || !cena) {
-                alert("Unesi naslov i cenu!");
-                return;
-            }
+            if (!naslov || !cena) { alert("Unesi naslov i cenu!"); return; }
             
             try {
-                // Upis u Firebase
                 await db.collection('radovi').add({
                     naslov: naslov,
                     cena: Number(cena),
                     slika: slikaBase64,
                     vreme: Date.now()
                 });
-                
-                alert("Rad uspešno sačuvan!");
-                
-                // Reset
+                alert("Rad sačuvan!");
                 document.getElementById('naslov').value = '';
                 document.getElementById('cena').value = '';
                 document.getElementById('preview').style.display = 'none';
                 slikaBase64 = '';
-                
-                // Osvezi listu
                 ucitajRadove();
-                
             } catch (error) {
-                alert("GREŠKA PRI ČUVANJU: " + error.message);
-                console.log(error);
+                alert("Greška: " + error.message);
             }
         }
 
-        // Ucitaj radove
         async function ucitajRadove() {
-            try {
-                let snapshot = await db.collection('radovi').orderBy('vreme').get();
-                let lista = document.getElementById('lista');
-                lista.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    lista.innerHTML = '<p>Još uvek nema radova</p>';
-                    return;
-                }
-                
-                snapshot.forEach(doc => {
-                    let r = doc.data();
-                    lista.innerHTML += `
-                        <div style="border:1px solid #ddd; padding:10px; margin:10px 0;">
-                            <img src="${r.slika}" style="max-width:100%; max-height:150px;">
-                            <p><strong>${r.naslov}</strong> - ${r.cena}€</p>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                alert("GREŠKA PRI UČITAVANJU: " + error.message);
-            }
+            let snapshot = await db.collection('radovi').orderBy('vreme').get();
+            let lista = document.getElementById('lista');
+            lista.innerHTML = '';
+            if (snapshot.empty) { lista.innerHTML = '<p>Nema radova</p>'; return; }
+            snapshot.forEach(doc => {
+                let r = doc.data();
+                lista.innerHTML += `<div class="rad"><img src="${r.slika}"><p><strong>${r.naslov}</strong> - ${r.cena}€</p></div>`;
+            });
         }
     </script>
 </body>
