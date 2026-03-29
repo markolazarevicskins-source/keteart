@@ -1,443 +1,197 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Админ панел - Никола Гаћеша</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 10px;
-        }
-        
-        .admin-panel {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .button-group {
-            margin: 15px 0;
-            padding: 15px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .button-group h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: clamp(1rem, 4vw, 1.2rem);
-        }
-        
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-        }
-        
-        button {
-            padding: 12px 10px;
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-            border: none;
-            border-radius: 10px;
-            background: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-height: 50px;
-            word-break: break-word;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            background: #0056b3;
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        @media (max-width: 600px) {
-            .button-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            button {
-                padding: 15px 5px;
-                font-size: 14px;
-            }
-            
-            .admin-panel {
-                padding: 10px;
-            }
-        }
-        
-        .upload-area {
-            border: 2px dashed #007bff;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            margin: 20px 0;
-            background: #f8f9fa;
-            cursor: pointer;
-        }
-        
-        .upload-area.dragover {
-            background: #e3f2fd;
-            border-color: #0056b3;
-        }
-        
-        #fileInput {
-            display: none;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .available { background: #28a745; color: white; }
-        .reserved { background: #ffc107; color: black; }
-        .sold { background: #dc3545; color: white; }
-        
-        .artworks-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .art-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .art-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        
-        .art-info {
-            padding: 15px;
-        }
-        
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .quick-actions button {
-            padding: 8px 5px;
-            font-size: 12px;
-            min-height: 40px;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        #preview {
-            max-width: 100%;
-            max-height: 300px;
-            margin: 20px 0;
-            display: none;
-            border-radius: 10px;
-        }
-    </style>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ панел | Никола Гаћеша</title>
+  <meta name="description" content="Админ панел за управљање радовима у галерији Николе Гаћеше.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
 </head>
 <body>
-    <div class="admin-panel">
-        <h1>⚙️ Никола Гаћеша - Админ панел</h1>
-        
-        <script>
-            const firebaseConfig = {
-                apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
-                authDomain: "nikola-gacesa-galerija.firebaseapp.com",
-                projectId: "nikola-gacesa-galerija",
-                storageBucket: "nikola-gacesa-galerija.firebasestorage.app",
-                messagingSenderId: "610040801324",
-                appId: "1:610040801324:web:8a721b63ee8f7689118989"
-            };
-
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            const auth = firebase.auth();
-        </script>
-
-        <!-- Login sekcija -->
-        <div id="loginSection" style="text-align: center; padding: 40px;">
-            <h2>🔐 Пријава</h2>
-            <input type="email" id="loginEmail" placeholder="Email" value="nikola@gmail.com">
-            <input type="password" id="loginPassword" placeholder="Lozinka" value="Nikola2024">
-            <button onclick="login()" style="width: 100%; background: #007bff;">ПРИЈАВИ СЕ</button>
+  <div class="site-shell container">
+    <header class="topbar glass">
+      <div class="brand">
+        <div class="brand-mark">⚙️</div>
+        <div>
+          <div class="brand-title">Админ панел — Никола Гаћеша</div>
+          <div class="brand-subtitle">додавање, измена, брисање, bulk акције и извоз</div>
         </div>
+      </div>
+      <nav class="topbar-nav" aria-label="Навигација">
+        <a href="index.html">Јавни сајт</a>
+        <a href="#loginSection">Пријава</a>
+        <a href="#adminSection">Радови</a>
+      </nav>
+    </header>
 
-        <!-- Admin sekcija -->
-        <div id="adminSection" style="display: none;">
-            <!-- GRUPA 1: DODAVANJE -->
-            <div class="button-group">
-                <h3>📤 Додај нови рад</h3>
-                <div class="upload-area" id="dropArea" onclick="document.getElementById('fileInput').click()">
-                    <p>🖼 Кликни или превуци слику овде</p>
-                    <p style="font-size: 12px; color: #666;">JPG, PNG (max 5MB)</p>
-                </div>
-                <input type="file" id="fileInput" accept="image/*" onchange="prikaziSliku(this)">
-                <img id="preview">
-                
-                <input type="text" id="naslov" placeholder="Назив дела">
-                <input type="number" id="cena" placeholder="Цена у €">
-                <input type="text" id="tehnika" placeholder="Техника (опционо)">
-                <input type="text" id="dimenzije" placeholder="Димензије (опционо)">
-                <textarea id="opis" placeholder="Опис (опционо)" rows="2"></textarea>
-                
-                <button onclick="sacuvaj()" style="width: 100%; background: #28a745;">📤 ОБЈАВИ РАД</button>
-            </div>
-
-            <!-- GRUPA 2: BRZE AKCIJE (DUGMIĆI) -->
-            <div class="button-group">
-                <h3>⚡ Брзе акције</h3>
-                <div class="button-grid">
-                    <button onclick="ucitajRadove()">🔄 Освежи</button>
-                    <button onclick="sortirajPoCeni()">💰 Сортирај по цени</button>
-                    <button onclick="sortirajPoDatumu()">📅 Сортирај по датуму</button>
-                    <button onclick="filterDostupno()">🟢 Само доступно</button>
-                    <button onclick="filterSve()">🖼 Све слике</button>
-                    <button onclick="obrisiSve()">⚠️ Обриши све</button>
-                </div>
-            </div>
-
-            <!-- GRUPA 3: STATISTIKA -->
-            <div class="button-group">
-                <h3>📊 Статистика</h3>
-                <div class="button-grid">
-                    <button onclick="brojRadova()">🔢 Број радова</button>
-                    <button onclick="ukupnaVrednost()">💰 Укупна вредност</button>
-                    <button onclick="prosecnaCena()">📈 Просечна цена</button>
-                </div>
-            </div>
-
-            <!-- Lista radova -->
-            <h2 style="margin-top: 30px;">📋 Постојећи радови</h2>
-            <div id="listaRadova" class="artworks-grid"></div>
+    <section class="section glass auth-layout" id="loginSection">
+      <article class="auth-card">
+        <h2>🔐 Пријава</h2>
+        <p class="section-lead">Пријави се Firebase налогом да би отворио админ панел и управљао радовима.</p>
+        <div class="form-grid" style="margin-top:16px;">
+          <div class="full">
+            <label class="small muted" for="loginEmail">Email</label>
+            <input id="loginEmail" class="input" type="email" autocomplete="username" placeholder="email@example.com">
+          </div>
+          <div class="full">
+            <label class="small muted" for="loginPassword">Лозинка</label>
+            <input id="loginPassword" class="input" type="password" autocomplete="current-password" placeholder="••••••••">
+          </div>
         </div>
-    </div>
+        <div class="auth-actions" style="margin-top:16px;">
+          <button class="btn" type="button" id="loginBtn">Пријави се</button>
+          <button class="btn secondary" type="button" id="logoutBtn">Одјави се</button>
+        </div>
+        <div id="authMessage" class="notice" style="margin-top:16px;">Ниси пријављен.</div>
+      </article>
 
-    <script>
-        let currentUser = null;
-        let slikaBase64 = "";
-        let sviRadovi = [];
+      <article class="auth-card">
+        <h2>🧭 Шта овај панел сада ради</h2>
+        <div class="info-list">
+          <div class="info-item"><span>•</span><div>Додавање новог рада са сликом, двојезичним насловом и описом, ценом, статусом и категоријом.</div></div>
+          <div class="info-item"><span>•</span><div>Измена постојећег рада без брисања старог уноса.</div></div>
+          <div class="info-item"><span>•</span><div>Bulk промена статуса, JSON и CSV извоз, претрага и филтери.</div></div>
+          <div class="info-item"><span>•</span><div>Брисање из Firestore-а и покушај брисања слике из Storage-а ако је сачувана путања.</div></div>
+        </div>
+      </article>
+    </section>
 
-        function login() {
-            let email = document.getElementById('loginEmail').value;
-            let pass = document.getElementById('loginPassword').value;
-            
-            auth.signInWithEmailAndPassword(email, pass)
-                .then((user) => {
-                    currentUser = user.user;
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('adminSection').style.display = 'block';
-                    ucitajRadove();
-                })
-                .catch(err => alert("Грешка: " + err.message));
-        }
+    <section class="section glass hidden" id="adminSection">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Управљање галеријом</h2>
+          <p>Нови радови могу да користе структуру старог сајта, али са модернијим моделом података и јавним филтерима.</p>
+        </div>
+      </div>
 
-        function prikaziSliku(input) {
-            if (input.files && input.files[0]) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    slikaBase64 = e.target.result;
-                    document.getElementById('preview').src = e.target.result;
-                    document.getElementById('preview').style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+      <div class="admin-stats" id="adminStats">
+        <div class="dashboard-card"><div class="value" id="countTotal">0</div><div class="muted">Укупно</div></div>
+        <div class="dashboard-card"><div class="value" id="countAvailable">0</div><div class="muted">Доступно</div></div>
+        <div class="dashboard-card"><div class="value" id="countReserved">0</div><div class="muted">Резервисано</div></div>
+        <div class="dashboard-card"><div class="value" id="countSold">0</div><div class="muted">Продато</div></div>
+      </div>
 
-        async function sacuvaj() {
-            if (!slikaBase64) { alert("Изабери слику!"); return; }
-            let naslov = document.getElementById('naslov').value;
-            let cena = document.getElementById('cena').value;
-            if (!naslov || !cena) { alert("Унеси назив и цену!"); return; }
-            
-            try {
-                await db.collection('radovi').add({
-                    naslov: naslov,
-                    cena: Number(cena),
-                    tehnika: document.getElementById('tehnika').value || "",
-                    dimenzije: document.getElementById('dimenzije').value || "",
-                    opis: document.getElementById('opis').value || "",
-                    slika: slikaBase64,
-                    vreme: Date.now()
-                });
-                
-                alert("✅ Рад сачуван!");
-                
-                document.getElementById('naslov').value = '';
-                document.getElementById('cena').value = '';
-                document.getElementById('tehnika').value = '';
-                document.getElementById('dimenzije').value = '';
-                document.getElementById('opis').value = '';
-                document.getElementById('preview').style.display = 'none';
-                slikaBase64 = '';
-                
-                ucitajRadove();
-            } catch (err) {
-                alert("Грешка: " + err.message);
-            }
-        }
+      <div class="admin-layout" style="margin-top:18px;">
+        <article class="admin-card">
+          <h2 id="formTitle">📤 Додај нови рад</h2>
+          <div class="dropzone" id="dropzone">
+            <input id="fileInput" class="hidden" type="file" accept="image/*">
+            <p><strong>Превуци слику овде</strong> или кликни за одабир</p>
+            <p class="muted small">JPG, PNG, WEBP. Слика се шаље у Firebase Storage.</p>
+          </div>
 
-        async function ucitajRadove() {
-            try {
-                let snapshot = await db.collection('radovi').orderBy('vreme', 'desc').get();
-                sviRadovi = [];
-                let lista = document.getElementById('listaRadova');
-                lista.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    lista.innerHTML = '<p style="text-align: center;">Нема радова</p>';
-                    return;
-                }
-                
-                snapshot.forEach(doc => {
-                    let r = doc.data();
-                    r.id = doc.id;
-                    sviRadovi.push(r);
-                    
-                    lista.innerHTML += `
-                        <div class="art-card">
-                            <img src="${r.slika}">
-                            <div class="art-info">
-                                <h3>${r.naslov}</h3>
-                                <p><strong>€${r.cena}</strong></p>
-                                <p>${r.tehnika} ${r.dimenzije}</p>
-                                <div class="quick-actions">
-                                    <button onclick="obrisi('${doc.id}')" style="background:#dc3545;">🗑 Обриши</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                alert("Грешка при учитавању: " + err.message);
-            }
-        }
+          <div class="preview-card" style="margin-top:16px;">
+            <div class="preview-media" id="previewMedia"></div>
+            <div id="fileMeta" class="notice">Није изабрана нова слика.</div>
+          </div>
 
-        async function obrisi(id) {
-            if (confirm("Сигуран?")) {
-                await db.collection('radovi').doc(id).delete();
-                ucitajRadove();
-            }
-        }
+          <div class="form-grid" style="margin-top:16px;">
+            <div class="full">
+              <label class="small muted" for="artTitle">Назив (SR)</label>
+              <input id="artTitle" class="input" type="text" placeholder="Назив дела">
+            </div>
+            <div class="full">
+              <label class="small muted" for="artTitleEn">Title (EN)</label>
+              <input id="artTitleEn" class="input" type="text" placeholder="Artwork title">
+            </div>
+            <div>
+              <label class="small muted" for="artPrice">Цена (€)</label>
+              <input id="artPrice" class="input" type="number" min="0" step="0.01" placeholder="0">
+            </div>
+            <div>
+              <label class="small muted" for="artYear">Година</label>
+              <input id="artYear" class="input" type="number" min="1900" max="2100" placeholder="2026">
+            </div>
+            <div>
+              <label class="small muted" for="artCategory">Категорија</label>
+              <select id="artCategory" class="select"></select>
+            </div>
+            <div>
+              <label class="small muted" for="artStatus">Статус</label>
+              <select id="artStatus" class="select">
+                <option value="available">Доступно</option>
+                <option value="reserved">Резервисано</option>
+                <option value="sold">Продато</option>
+              </select>
+            </div>
+            <div>
+              <label class="small muted" for="artTechnique">Техника (SR)</label>
+              <input id="artTechnique" class="input" type="text" placeholder="Уље на платну">
+            </div>
+            <div>
+              <label class="small muted" for="artTechniqueEn">Technique (EN)</label>
+              <input id="artTechniqueEn" class="input" type="text" placeholder="Oil on canvas">
+            </div>
+            <div class="full">
+              <label class="small muted" for="artDimensions">Димензије</label>
+              <input id="artDimensions" class="input" type="text" placeholder="80 x 100 cm">
+            </div>
+            <div class="full">
+              <label class="small muted" for="artDescription">Опис (SR)</label>
+              <textarea id="artDescription" class="textarea" placeholder="Кратак опис рада"></textarea>
+            </div>
+            <div class="full">
+              <label class="small muted" for="artDescriptionEn">Description (EN)</label>
+              <textarea id="artDescriptionEn" class="textarea" placeholder="Short artwork description"></textarea>
+            </div>
+          </div>
 
-        function sortirajPoCeni() {
-            let lista = document.getElementById('listaRadova');
-            let sortirani = [...sviRadovi].sort((a, b) => a.cena - b.cena);
-            
-            lista.innerHTML = '';
-            sortirani.forEach(r => {
-                lista.innerHTML += `
-                    <div class="art-card">
-                        <img src="${r.slika}">
-                        <div class="art-info">
-                            <h3>${r.naslov}</h3>
-                            <p><strong>€${r.cena}</strong></p>
-                            <div class="quick-actions">
-                                <button onclick="obrisi('${r.id}')" style="background:#dc3545;">🗑 Обриши</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
+          <div class="inline-actions" style="margin-top:16px;">
+            <button type="button" class="btn" id="saveBtn">Сачувај рад</button>
+            <button type="button" class="btn secondary" id="resetBtn">Очисти форму</button>
+            <button type="button" class="btn danger hidden" id="cancelEditBtn">Поништи измену</button>
+          </div>
+          <div id="formMessage" class="notice" style="margin-top:16px;">Спремно за унос.</div>
+        </article>
 
-        function sortirajPoDatumu() {
-            ucitajRadove(); // vrati na originalni redosled
-        }
+        <article class="list-card">
+          <h2>🖼 Листа радова</h2>
+          <div class="admin-toolbar" style="margin-top:12px;">
+            <input id="adminSearch" class="input" type="search" placeholder="Претражи назив, технику, опис...">
+            <select id="adminStatusFilter" class="select">
+              <option value="all">Сви статуси</option>
+              <option value="available">Доступно</option>
+              <option value="reserved">Резервисано</option>
+              <option value="sold">Продато</option>
+            </select>
+            <select id="adminCategoryFilter" class="select">
+              <option value="all">Све категорије</option>
+            </select>
+            <select id="adminSort" class="select">
+              <option value="date-desc">Најновије прво</option>
+              <option value="date-asc">Најстарије прво</option>
+              <option value="price-asc">Цена: мања → већа</option>
+              <option value="price-desc">Цена: већа → мања</option>
+              <option value="title-asc">Назив A → Ш</option>
+            </select>
+          </div>
 
-        function filterDostupno() {
-            alert("Филтер за статус - може се додати касније");
-        }
+          <div class="selection-toolbar" style="margin-top:16px;">
+            <div class="muted" id="selectionInfo">Изабрано: 0</div>
+            <div class="bulk-actions">
+              <select id="bulkStatus" class="select">
+                <option value="available">Све у доступно</option>
+                <option value="reserved">Све у резервисано</option>
+                <option value="sold">Све у продато</option>
+              </select>
+              <button type="button" class="btn secondary" id="applyBulkBtn">Примени</button>
+              <button type="button" class="btn secondary" id="exportJsonBtn">JSON</button>
+              <button type="button" class="btn secondary" id="exportCsvBtn">CSV</button>
+            </div>
+          </div>
 
-        function filterSve() {
-            ucitajRadove();
-        }
+          <div id="listMessage" class="notice" style="margin-top:12px;">Учитавање радова...</div>
+          <div class="admin-gallery" id="adminGallery" style="margin-top:16px;"></div>
+        </article>
+      </div>
+    </section>
+  </div>
 
-        function obrisiSve() {
-            if (confirm("Да ли си сигуран да желиш да обришеш СВЕ радове?")) {
-                sviRadovi.forEach(async (r) => {
-                    await db.collection('radovi').doc(r.id).delete();
-                });
-                ucitajRadove();
-            }
-        }
-
-        function brojRadova() {
-            alert("Укупан број радова: " + sviRadovi.length);
-        }
-
-        function ukupnaVrednost() {
-            let ukupno = sviRadovi.reduce((sum, r) => sum + r.cena, 0);
-            alert("Укупна вредност: €" + ukupno);
-        }
-
-        function prosecnaCena() {
-            if (sviRadovi.length === 0) { alert("Нема радова"); return; }
-            let prosek = sviRadovi.reduce((sum, r) => sum + r.cena, 0) / sviRadovi.length;
-            alert("Просечна цена: €" + prosek.toFixed(2));
-        }
-
-        // Drag & drop
-        let dropArea = document.getElementById('dropArea');
-        dropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropArea.classList.add('dragover');
-        });
-        dropArea.addEventListener('dragleave', () => {
-            dropArea.classList.remove('dragover');
-        });
-        dropArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropArea.classList.remove('dragover');
-            if (e.dataTransfer.files[0]) {
-                document.getElementById('fileInput').files = e.dataTransfer.files;
-                prikaziSliku(document.getElementById('fileInput'));
-            }
-        });
-    </script>
+  <script src="admin.js"></script>
 </body>
 </html>

@@ -1,257 +1,242 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Никола Гаћеша - Сликар</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        header {
-            background: rgba(255,255,255,0.95);
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        header h1 {
-            font-size: clamp(2rem, 8vw, 3rem);
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        header p {
-            font-size: clamp(1rem, 4vw, 1.2rem);
-            color: #666;
-        }
-        
-        nav {
-            background: white;
-            padding: 15px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        nav button {
-            margin: 5px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            background: #f0f0f0;
-            color: #333;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            cursor: pointer;
-            transition: 0.3s;
-            display: inline-block;
-        }
-        
-        nav button:hover {
-            background: #007bff;
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        #gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        @media (max-width: 600px) {
-            #gallery {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                padding: 20px;
-            }
-        }
-        
-        .art-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: 0.3s;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .art-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        
-        .art-card img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-        
-        @media (max-width: 600px) {
-            .art-card img {
-                height: 250px;
-            }
-        }
-        
-        .art-info {
-            padding: 20px;
-        }
-        
-        .art-title {
-            font-size: clamp(1.2rem, 5vw, 1.5rem);
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .art-price {
-            font-size: clamp(1.3rem, 5vw, 1.8rem);
-            color: #007bff;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .art-technique {
-            color: #666;
-            font-size: 0.9rem;
-            margin: 5px 0;
-        }
-        
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 1.5rem;
-            padding: 50px;
-        }
-        
-        .no-artworks {
-            text-align: center;
-            color: white;
-            font-size: 1.5rem;
-            padding: 50px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin: 20px;
-        }
-    </style>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Никола Гаћеша | Уметничка галерија</title>
+  <meta name="description" content="Уметничка галерија Николе Гаћеше — радови, категорије, детаљи дела и контакт за куповину или наручивање принтова на платну.">
+  <meta property="og:title" content="Никола Гаћеша | Уметничка галерија">
+  <meta property="og:description" content="Модеран уметнички сајт који задржава структуру старог портфолија: почетна, радови по категоријама и контакт.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
 </head>
 <body>
-    <header>
-        <h1>🎨 НИКОЛА ГАЋЕША</h1>
-        <p>Уметничка галерија и продавница</p>
+  <div class="site-shell container">
+    <header class="topbar glass">
+      <div class="brand">
+        <div class="brand-mark">🎨</div>
+        <div>
+          <div class="brand-title" data-i18n="brandTitle">Никола Гаћеша</div>
+          <div class="brand-subtitle" data-i18n="brandSubtitle">уметничка галерија | Kete Art</div>
+        </div>
+      </div>
+      <nav class="topbar-nav" aria-label="Главна навигација">
+        <a href="#hero" class="is-active" data-i18n="navHome">Почетна</a>
+        <a href="#works" data-i18n="navWorks">Радови</a>
+        <a href="#categories" data-i18n="navCategories">Категорије</a>
+        <a href="#about" data-i18n="navAbout">О уметнику</a>
+        <a href="#contact" data-i18n="navContact">Контакт</a>
+      </nav>
+      <div class="lang-toggle" aria-label="Language selector">
+        <button type="button" class="is-active" data-lang-btn="sr">СР</button>
+        <button type="button" data-lang-btn="en">EN</button>
+      </div>
     </header>
 
-    <nav>
-        <button onclick="prikaziSve()">🖼 Све слике</button>
-        <button onclick="sortirajPoCeni()">💰 Сортирај по цени</button>
-        <button onclick="sortirajPoDatumu()">📅 Најновије прво</button>
-        <button onclick="window.location.reload()">🔄 Освежи</button>
-    </nav>
+    <section id="hero" class="hero glass">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow" data-i18n="eyebrow">портфолио + продаја + архивa радова</div>
+          <h1 data-i18n="heroTitle">Никола Гаћеша<br>Кете</h1>
+          <p class="lead" data-i18n="heroLead">
+            Академски сликар из Србије. Сајт спаја атмосферу старог портфолија са модерном галеријом, прегледом радова,
+            категоријама и директним упитом за куповину.
+          </p>
+          <div class="hero-actions" style="margin-top:18px;">
+            <a class="btn" href="#works" data-i18n="heroPrimary">Погледај радове</a>
+            <a class="btn secondary" href="#contact" data-i18n="heroSecondary">Контакт / куповина</a>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <h3 data-i18n="heroPanelTitle">Основа старог сајта — сада у модернијем облику</h3>
+          <div class="hero-list">
+            <div class="hero-list-item">
+              <span>•</span>
+              <div><strong data-i18n="heroPoint1Title">Биографија</strong><br><span data-i18n="heroPoint1Text">Кратак ауторски увод и представљање уметника.</span></div>
+            </div>
+            <div class="hero-list-item">
+              <span>•</span>
+              <div><strong data-i18n="heroPoint2Title">Радови по категоријама</strong><br><span data-i18n="heroPoint2Text">Стари радови, нови цртежи и слике, лица, туш, хемијска оловка, графике, вајарство, фотографије и цртежи.</span></div>
+            </div>
+            <div class="hero-list-item">
+              <span>•</span>
+              <div><strong data-i18n="heroPoint3Title">Контакт и принтови</strong><br><span data-i18n="heroPoint3Text">Упит за оригинал и напомена да су радови доступни и као принтови на платну.</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
 
-    <main id="gallery">
-        <div class="loading">🔄 Учитавање радова...</div>
-    </main>
+    <section class="section glass" id="stats">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" data-i18n="statsTitle">Брз преглед галерије</h2>
+          <p data-i18n="statsLead">Бројеви се учитавају директно из Firebase колекције, тако да јавни део и админ увек гледају исте податке.</p>
+        </div>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="value" id="statTotal">0</div>
+          <div class="label" data-i18n="statTotal">Укупно радова</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="statAvailable">0</div>
+          <div class="label" data-i18n="statAvailable">Доступно</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="statReserved">0</div>
+          <div class="label" data-i18n="statReserved">Резервисано</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="statSold">0</div>
+          <div class="label" data-i18n="statSold">Продато</div>
+        </div>
+      </div>
+    </section>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2M4L84Vmjd6QCs9J5HxtH9A8h1xoxR1o",
-            authDomain: "nikola-gacesa-galerija.firebaseapp.com",
-            projectId: "nikola-gacesa-galerija",
-            storageBucket: "nikola-gacesa-galerija.firebasestorage.app",
-            messagingSenderId: "610040801324",
-            appId: "1:610040801324:web:8a721b63ee8f7689118989"
-        };
+    <section class="section glass" id="categories">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" data-i18n="catTitle">Категорије из старог сајта</h2>
+          <p data-i18n="catLead">Структура старог WordPress сајта је задржана и претворена у прегледнији систем категорија. Сваки нови рад из админа може одмах да се веже за одговарајућу категорију.</p>
+        </div>
+      </div>
+      <div class="category-grid" id="categoryCards"></div>
+    </section>
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
-        let sviRadovi = [];
+    <section class="section glass" id="works">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" data-i18n="worksTitle">Радови</h2>
+          <p data-i18n="worksLead">Јавни део сад приказује динамичку галерију из Firebase-а, уз претрагу, филтере, категорије и јасне статусе доступности.</p>
+        </div>
+      </div>
 
-        async function ucitajRadove() {
-            try {
-                const snapshot = await db.collection('radovi').orderBy('vreme', 'desc').get();
-                const gallery = document.getElementById('gallery');
-                
-                if (snapshot.empty) {
-                    gallery.innerHTML = '<div class="no-artworks">🖼 Тренутно нема радова</div>';
-                    return;
-                }
+      <div class="filter-panel">
+        <div class="gallery-toolbar">
+          <div class="toolbar-row search-wrap">
+            <label class="sr-only" for="searchInput">Претрага</label>
+            <input id="searchInput" class="input" type="search" placeholder="Претражи по називу, техници, опису...">
+          </div>
+          <div class="toolbar-row">
+            <select id="statusFilter" class="select" aria-label="Филтер статуса">
+              <option value="all">Сви статуси</option>
+              <option value="available">Доступно</option>
+              <option value="reserved">Резервисано</option>
+              <option value="sold">Продато</option>
+            </select>
+            <select id="categoryFilter" class="select" aria-label="Филтер категорије">
+              <option value="all">Све категорије</option>
+            </select>
+            <select id="sortFilter" class="select" aria-label="Сортирање">
+              <option value="date-desc">Најновије прво</option>
+              <option value="date-asc">Најстарије прво</option>
+              <option value="price-asc">Цена: мања → већа</option>
+              <option value="price-desc">Цена: већа → мања</option>
+              <option value="title-asc">Назив A → Ш</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row" id="quickStatusChips"></div>
+      </div>
 
-                sviRadovi = [];
-                snapshot.forEach(doc => {
-                    sviRadovi.push(doc.data());
-                });
-                
-                prikaziRadove(sviRadovi);
-            } catch (error) {
-                console.error("Greška:", error);
-                document.getElementById('gallery').innerHTML = '<div class="no-artworks">❌ Грешка при учитавању</div>';
-            }
-        }
+      <div class="gallery-panel" style="margin-top:16px;">
+        <div id="galleryInfo" class="muted small" style="margin-bottom:14px;"></div>
+        <div id="gallery" class="gallery-grid"></div>
+      </div>
+    </section>
 
-        function prikaziRadove(radovi) {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-            
-            radovi.forEach(r => {
-                const card = document.createElement('div');
-                card.className = 'art-card';
-                
-                let tehnikaDim = "";
-                if (r.tehnika || r.dimenzije) {
-                    tehnikaDim = `<p class="art-technique">${r.tehnika || ''} ${r.dimenzije || ''}</p>`;
-                }
-                
-                card.innerHTML = `
-                    <img src="${r.slika}" alt="${r.naslov}" loading="lazy">
-                    <div class="art-info">
-                        <h3 class="art-title">${r.naslov}</h3>
-                        <div class="art-price">€${r.cena}</div>
-                        ${tehnikaDim}
-                    </div>
-                `;
-                gallery.appendChild(card);
-            });
-        }
+    <section class="section glass" id="about">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" data-i18n="aboutTitle">О уметнику</h2>
+          <p data-i18n="aboutLead">Ова секција је заснована на тону и структури старе почетне странице, али је прилагођена модерном приказу и двојезичности.</p>
+        </div>
+      </div>
+      <div class="contact-grid">
+        <article class="contact-card">
+          <h3 data-i18n="aboutCardTitle">Биографија</h3>
+          <div class="info-list">
+            <div class="info-item"><span>•</span><div data-i18n="aboutBio1">Моје име је Никола Гаћеша, надимак Кете. Рођен сам 1982. године у Србији.</div></div>
+            <div class="info-item"><span>•</span><div data-i18n="aboutBio2">Академски сам сликар и имам више самосталних и групних изложби.</div></div>
+            <div class="info-item"><span>•</span><div data-i18n="aboutBio3">Овде је спојен класичан портфолио и функционалан јавни каталог за преглед, упит и продају.</div></div>
+          </div>
+        </article>
+        <article class="contact-card">
+          <h3 data-i18n="aboutSecondTitle">Шта је ново у односу на стари сајт</h3>
+          <div class="info-list">
+            <div class="info-item"><span>•</span><div data-i18n="aboutFeat1">Бржа галерија са претрагом, сортирањем и бољим мобилним приказом.</div></div>
+            <div class="info-item"><span>•</span><div data-i18n="aboutFeat2">Јасни статуси: доступно, резервисано и продато.</div></div>
+            <div class="info-item"><span>•</span><div data-i18n="aboutFeat3">Један админ панел за додавање, измену, брисање, bulk промене и извоз података.</div></div>
+          </div>
+        </article>
+      </div>
+    </section>
 
-        function prikaziSve() {
-            prikaziRadove(sviRadovi);
-        }
+    <section class="section glass" id="contact">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" data-i18n="contactTitle">Контакт и упит за куповину</h2>
+          <p data-i18n="contactLead">Стара контакт страница је била задржана као важан део сајта. Овде је претворена у јаснији, продајно употребљив блок.</p>
+        </div>
+      </div>
+      <div class="contact-grid">
+        <article class="contact-card">
+          <h3 data-i18n="contactCard1Title">Подаци</h3>
+          <div class="contact-list">
+            <div class="contact-item"><span>✉️</span><div><strong data-i18n="contactEmailLabel">Електронска пошта</strong><br><a id="artistEmailLink" href="mailto:keteart@gmail.com">keteart@gmail.com</a></div></div>
+            <div class="contact-item"><span>👤</span><div><strong data-i18n="contactArtistLabel">Уметник</strong><br><span id="artistNameValue">Никола Гаћеша — Кете</span></div></div>
+            <div class="contact-item"><span>🖨️</span><div><strong data-i18n="contactPrintsLabel">Принтови</strong><br><span data-i18n="contactPrintsText">Сви радови могу бити понуђени и као принт на платну.</span></div></div>
+          </div>
+        </article>
+        <article class="contact-card">
+          <h3 data-i18n="contactCard2Title">Брзи упит</h3>
+          <p class="section-lead" data-i18n="contactQuickText">Клик на дугме аутоматски отвара mail клијент и припрема упит за конкретан рад.</p>
+          <div class="inline-actions" style="margin-top:16px;">
+            <a class="btn" id="genericInquiryBtn" href="mailto:keteart@gmail.com?subject=Upit%20za%20umetni%C4%8Dko%20delo" data-i18n="contactQuickBtn">Пошаљи општи упит</a>
+            <a class="btn secondary" href="admin.html" data-i18n="contactAdminBtn">Админ панел</a>
+          </div>
+        </article>
+      </div>
+    </section>
 
-        function sortirajPoCeni() {
-            let sortirani = [...sviRadovi].sort((a, b) => a.cena - b.cena);
-            prikaziRadove(sortirani);
-        }
+    <footer class="footer">
+      <div data-i18n="footerText">© Никола Гаћеша | модернизована галерија инспирисана старим портфолиом</div>
+    </footer>
+  </div>
 
-        function sortirajPoDatumu() {
-            // vrati na originalni redosled (najnoviji prvi)
-            prikaziRadove(sviRadovi);
-        }
+  <div class="modal" id="artModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="close-btn"><button class="icon-btn" type="button" id="closeModalBtn">✕</button></div>
+      <div class="modal-grid">
+        <div class="modal-image"><img id="modalImage" alt=""></div>
+        <div class="modal-copy">
+          <div class="meta-line" style="margin-bottom:10px;">
+            <span class="badge category" id="modalCategory"></span>
+            <span class="badge" id="modalStatus"></span>
+          </div>
+          <h2 id="modalTitle"></h2>
+          <div class="price" id="modalPrice"></div>
+          <div class="modal-details" style="margin:16px 0;">
+            <div><strong data-i18n="modalTechnique">Техника:</strong> <span id="modalTechniqueValue"></span></div>
+            <div><strong data-i18n="modalDimensions">Димензије:</strong> <span id="modalDimensionsValue"></span></div>
+            <div><strong data-i18n="modalYear">Година:</strong> <span id="modalYearValue"></span></div>
+            <div><strong data-i18n="modalPrint">Принт:</strong> <span data-i18n="modalPrintValue">Доступан и као принт на платну</span></div>
+          </div>
+          <p id="modalDescription" class="section-lead"></p>
+          <div class="inline-actions" style="margin-top:18px;">
+            <a class="btn" id="modalInquiryBtn" href="#" data-i18n="modalInquiry">Пошаљи упит за овај рад</a>
+            <a class="btn secondary" href="#contact" data-i18n="modalContact">Контакт</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        window.onload = ucitajRadove;
-    </script>
+  <script src="script.js"></script>
 </body>
 </html>
