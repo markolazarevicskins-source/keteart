@@ -1,7 +1,6 @@
-const SITE = window.FirebaseSiteConfig;
+const SITE = window.FirebaseSiteConfig || {};
 const db = window.firebaseDb;
 
-const CATEGORY_LOOKUP = new Map((SITE?.categories || []).map(item => [item.key, item]));
 const STATUS_META = {
   available: { sr: 'Доступно', en: 'Available', cls: 'available' },
   reserved: { sr: 'Резервисано', en: 'Reserved', cls: 'reserved' },
@@ -19,7 +18,6 @@ const translations = {
     navContact: 'Контакт',
     eyebrow: 'портфолио + продаја + архивa радова',
     heroTitle: 'Никола Гаћеша<br>Кете',
-    heroLead: 'Академски сликар из Србије. Сајт спаја атмосферу старог портфолија са модерном галеријом, прегледом радова, категоријама и директним упитом за куповину.',
     heroPrimary: 'Погледај радове',
     heroSecondary: 'Контакт / куповина',
     heroPanelTitle: 'Основа старог сајта — сада у модернијем облику',
@@ -36,26 +34,21 @@ const translations = {
     statReserved: 'Резервисано',
     statSold: 'Продато',
     catTitle: 'Категорије из старог сајта',
-    catLead: 'Структура старог WordPress сајта је задржана и претворена у прегледнији систем категорија. Сваки нови рад из админа може одмах да се веже за одговарајућу категорију.',
+    catLead: 'Структура старог WordPress сајта је задржана и претворена у прегледнији систем категорија. Свака категорија може да се мења у админ панелу.',
     worksTitle: 'Радови',
-    worksLead: 'Јавни део сад приказује динамичку галерију из Firebase-а, уз претрагу, филтере, категорије и јасне статусе доступности.',
+    worksLead: 'Јавни део приказује динамичку галерију из Firebase-а, уз претрагу, филтере, категорије, цене и јасне статусе доступности.',
     aboutTitle: 'О уметнику',
     aboutLead: 'Ова секција је заснована на тону и структури старе почетне странице, али је прилагођена модерном приказу и двојезичности.',
     aboutCardTitle: 'Биографија',
-    aboutBio1: 'Моје име је Никола Гаћеша, надимак Кете. Рођен сам 1982. године у Србији.',
-    aboutBio2: 'Академски сам сликар и имам више самосталних и групних изложби.',
-    aboutBio3: 'Овде је спојен класичан портфолио и функционалан јавни каталог за преглед, упит и продају.',
     aboutSecondTitle: 'Шта је ново у односу на стари сајт',
     aboutFeat1: 'Бржа галерија са претрагом, сортирањем и бољим мобилним приказом.',
     aboutFeat2: 'Јасни статуси: доступно, резервисано и продато.',
-    aboutFeat3: 'Један админ панел за додавање, измену, брисање, bulk промене и извоз података.',
+    aboutFeat3: 'Један админ панел за додавање, измену, брисање, bulk промене, извоз, текстове и категорије.',
     contactTitle: 'Контакт и упит за куповину',
-    contactLead: 'Стара контакт страница је била задржана као важан део сајта. Овде је претворена у јаснији, продајно употребљив блок.',
     contactCard1Title: 'Подаци',
     contactEmailLabel: 'Електронска пошта',
     contactArtistLabel: 'Уметник',
     contactPrintsLabel: 'Принтови',
-    contactPrintsText: 'Сви радови могу бити понуђени и као принт на платну.',
     contactCard2Title: 'Брзи упит',
     contactQuickText: 'Клик на дугме аутоматски отвара mail клијент и припрема упит за конкретан рад.',
     contactQuickBtn: 'Пошаљи општи упит',
@@ -65,7 +58,6 @@ const translations = {
     modalDimensions: 'Димензије:',
     modalYear: 'Година:',
     modalPrint: 'Принт:',
-    modalPrintValue: 'Доступан и као принт на платну',
     modalInquiry: 'Пошаљи упит за овај рад',
     modalContact: 'Контакт',
     searchPlaceholder: 'Претражи по називу, техници, опису...',
@@ -82,12 +74,15 @@ const translations = {
     chipAll: 'Све',
     galleryCount: count => `Приказано радова: ${count}`,
     galleryCountFiltered: (count, total) => `Приказано ${count} од ${total} радова`,
-    emptyState: 'Тренутно нема радова који одговарају изабраним критеријумима.',
+    emptyState: 'Тренутно нема радова који одговарају изабраним критеријумима. Ако је ово нов сајт, радови се додају у админ панелу.',
     loading: 'Учитавање радова...',
     loadError: 'Дошло је до грешке при учитавању радова.',
     priceLabel: 'Цена на упит',
+    legacyLabel: 'Старо име/текст:',
+    filterCategory: 'Филтрирај категорију',
+    hiddenCategory: 'Сакривена категорија',
     inquirySubject: title => `Упит за рад: ${title}`,
-    inquiryBody: title => `Поштовање,%0D%0A%0D%0Aинтересује ме рад „${title}“. Молим Вас за више информација.%0D%0A%0D%0AHвала.`
+    inquiryBody: title => `Поштовање,\n\nинтересује ме рад „${title}“. Молим Вас за више информација о цени, доступности и опцији принта на платну.\n\nХвала.`
   },
   en: {
     brandTitle: 'Nikola Gacesa',
@@ -99,7 +94,6 @@ const translations = {
     navContact: 'Contact',
     eyebrow: 'portfolio + sales + archive',
     heroTitle: 'Nikola Gacesa<br>Kete',
-    heroLead: 'An academic painter from Serbia. This site preserves the spirit of the older portfolio while adding a modern gallery, categories and direct purchase inquiry.',
     heroPrimary: 'View works',
     heroSecondary: 'Contact / purchase',
     heroPanelTitle: 'The old site structure — redesigned for today',
@@ -116,26 +110,21 @@ const translations = {
     statReserved: 'Reserved',
     statSold: 'Sold',
     catTitle: 'Categories carried over from the old site',
-    catLead: 'The former WordPress structure is preserved and translated into a cleaner category system. Every new artwork added in the admin can be assigned immediately.',
+    catLead: 'The former WordPress structure is preserved and converted into a cleaner category system. Each category can be managed in the admin panel.',
     worksTitle: 'Works',
-    worksLead: 'The public section now displays a dynamic Firebase-powered gallery with search, filters, categories and clear availability statuses.',
+    worksLead: 'The public section displays a dynamic Firebase-powered gallery with search, filters, categories, prices and clear availability statuses.',
     aboutTitle: 'About the artist',
     aboutLead: 'This section follows the tone and structure of the older home page, adapted for a cleaner bilingual presentation.',
     aboutCardTitle: 'Biography',
-    aboutBio1: 'My name is Nikola Gacesa, nickname Kete. I was born in 1982 in Serbia.',
-    aboutBio2: 'I am an academic painter with several solo and group exhibitions.',
-    aboutBio3: 'This site combines a classic portfolio feeling with a practical public catalogue for browsing, inquiry and sales.',
     aboutSecondTitle: 'What is improved',
     aboutFeat1: 'Faster gallery with search, sorting and much better mobile presentation.',
     aboutFeat2: 'Clear statuses: available, reserved and sold.',
-    aboutFeat3: 'One admin panel for adding, editing, deleting, bulk updates and exporting data.',
+    aboutFeat3: 'One admin panel for adding, editing, deleting, bulk updates, exports, texts and categories.',
     contactTitle: 'Contact and purchase inquiry',
-    contactLead: 'The older contact page was kept as an essential site element. It is now presented in a cleaner, more practical format.',
     contactCard1Title: 'Details',
     contactEmailLabel: 'Email',
     contactArtistLabel: 'Artist',
     contactPrintsLabel: 'Prints',
-    contactPrintsText: 'All works can also be offered as canvas prints.',
     contactCard2Title: 'Quick inquiry',
     contactQuickText: 'The button opens your email client and prepares an inquiry for the selected work.',
     contactQuickBtn: 'Send general inquiry',
@@ -145,7 +134,6 @@ const translations = {
     modalDimensions: 'Dimensions:',
     modalYear: 'Year:',
     modalPrint: 'Print:',
-    modalPrintValue: 'Also available as a canvas print',
     modalInquiry: 'Send inquiry for this work',
     modalContact: 'Contact',
     searchPlaceholder: 'Search by title, technique, description...',
@@ -162,19 +150,24 @@ const translations = {
     chipAll: 'All',
     galleryCount: count => `Showing works: ${count}`,
     galleryCountFiltered: (count, total) => `Showing ${count} of ${total} works`,
-    emptyState: 'There are no works matching the selected criteria right now.',
-    loading: 'Loading works...',
-    loadError: 'An error occurred while loading the artworks.',
+    emptyState: 'There are currently no works matching the selected criteria. If this is a new site, artworks are added in the admin panel.',
+    loading: 'Loading artworks...',
+    loadError: 'There was an error while loading artworks.',
     priceLabel: 'Price on request',
-    inquirySubject: title => `Inquiry for artwork: ${title}`,
-    inquiryBody: title => `Hello,%0D%0A%0D%0AI am interested in the artwork "${title}". Please send me more information.%0D%0A%0D%0AThank you.`
+    legacyLabel: 'Old title/text:',
+    filterCategory: 'Filter category',
+    hiddenCategory: 'Hidden category',
+    inquirySubject: title => `Artwork inquiry: ${title}`,
+    inquiryBody: title => `Hello,\n\nI am interested in the work “${title}”. Please send me more information about price, availability and the canvas print option.\n\nThank you.`
   }
 };
 
 const state = {
-  lang: 'sr',
+  lang: localStorage.getItem('kete-lang') || 'sr',
   artworks: [],
   filtered: [],
+  categories: normalizeCategories(SITE.categories || []),
+  siteContent: { ...(SITE.defaultSiteContent || {}) },
   search: '',
   status: 'all',
   category: 'all',
@@ -184,193 +177,281 @@ const state = {
 
 const elements = {};
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   cacheElements();
-  renderCategoryCards();
   bindEvents();
   applyLanguage();
+  applySiteContent();
   renderQuickChips();
-  loadArtworks();
+  renderCategoryCards();
+
+  await loadRemoteSiteConfiguration();
+  applyLanguage();
+  applySiteContent();
+  renderCategoryCards();
+  populateCategoryFilter();
+  await loadArtworks();
 });
 
 function cacheElements() {
-  elements.searchInput = document.getElementById('searchInput');
-  elements.statusFilter = document.getElementById('statusFilter');
-  elements.categoryFilter = document.getElementById('categoryFilter');
-  elements.sortFilter = document.getElementById('sortFilter');
-  elements.gallery = document.getElementById('gallery');
-  elements.galleryInfo = document.getElementById('galleryInfo');
-  elements.quickStatusChips = document.getElementById('quickStatusChips');
-  elements.categoryCards = document.getElementById('categoryCards');
-  elements.modal = document.getElementById('artModal');
-  elements.modalImage = document.getElementById('modalImage');
-  elements.modalCategory = document.getElementById('modalCategory');
-  elements.modalStatus = document.getElementById('modalStatus');
-  elements.modalTitle = document.getElementById('modalTitle');
-  elements.modalPrice = document.getElementById('modalPrice');
-  elements.modalTechniqueValue = document.getElementById('modalTechniqueValue');
-  elements.modalDimensionsValue = document.getElementById('modalDimensionsValue');
-  elements.modalYearValue = document.getElementById('modalYearValue');
-  elements.modalDescription = document.getElementById('modalDescription');
-  elements.modalInquiryBtn = document.getElementById('modalInquiryBtn');
-  elements.closeModalBtn = document.getElementById('closeModalBtn');
-  elements.statTotal = document.getElementById('statTotal');
-  elements.statAvailable = document.getElementById('statAvailable');
-  elements.statReserved = document.getElementById('statReserved');
-  elements.statSold = document.getElementById('statSold');
-  elements.artistEmailLink = document.getElementById('artistEmailLink');
-  elements.artistNameValue = document.getElementById('artistNameValue');
-  elements.genericInquiryBtn = document.getElementById('genericInquiryBtn');
+  const ids = [
+    'searchInput','statusFilter','categoryFilter','sortFilter','quickStatusChips','gallery','galleryInfo','categoryCards',
+    'statTotal','statAvailable','statReserved','statSold','artModal','modalImage','modalCategory','modalStatus','modalTitle',
+    'modalPrice','modalTechniqueValue','modalDimensionsValue','modalYearValue','modalDescription','modalInquiryBtn','closeModalBtn',
+    'genericInquiryBtn','artistEmailLink','artistNameValue','dynamicHeroLead','dynamicAboutText','dynamicPrintsText','dynamicContactLead',
+    'dynamicSocialLinks','modalPrintText','contactPrintsText'
+  ];
+  ids.forEach(id => elements[id] = document.getElementById(id));
 }
 
 function bindEvents() {
-  elements.searchInput.addEventListener('input', event => {
-    state.search = event.target.value.trim().toLowerCase();
-    applyFilters();
-  });
-
-  elements.statusFilter.addEventListener('change', event => {
-    state.status = event.target.value;
-    state.quickStatus = event.target.value === 'all' ? 'all' : event.target.value;
-    renderQuickChips();
-    applyFilters();
-  });
-
-  elements.categoryFilter.addEventListener('change', event => {
-    state.category = event.target.value;
-    applyFilters();
-  });
-
-  elements.sortFilter.addEventListener('change', event => {
-    state.sort = event.target.value;
-    applyFilters();
-  });
-
   document.querySelectorAll('[data-lang-btn]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.lang = btn.dataset.langBtn;
-      document.querySelectorAll('[data-lang-btn]').forEach(el => el.classList.toggle('is-active', el === btn));
+      localStorage.setItem('kete-lang', state.lang);
       applyLanguage();
+      applySiteContent();
       renderCategoryCards();
       populateCategoryFilter();
       renderQuickChips();
-      renderGallery();
+      applyFilters();
     });
   });
 
-  document.querySelectorAll('.topbar-nav a').forEach(link => {
-    link.addEventListener('click', () => {
-      document.querySelectorAll('.topbar-nav a').forEach(el => el.classList.remove('is-active'));
-      link.classList.add('is-active');
-    });
+  elements.searchInput?.addEventListener('input', event => {
+    state.search = event.target.value.trim().toLowerCase();
+    applyFilters();
   });
-
-  elements.closeModalBtn.addEventListener('click', closeModal);
-  elements.modal.addEventListener('click', event => {
-    if (event.target === elements.modal) closeModal();
+  elements.statusFilter?.addEventListener('change', event => {
+    state.status = event.target.value;
+    state.quickStatus = event.target.value;
+    renderQuickChips();
+    applyFilters();
   });
-
+  elements.categoryFilter?.addEventListener('change', event => {
+    state.category = event.target.value;
+    applyFilters();
+  });
+  elements.sortFilter?.addEventListener('change', event => {
+    state.sort = event.target.value;
+    applyFilters();
+  });
+  elements.closeModalBtn?.addEventListener('click', closeModal);
+  elements.artModal?.addEventListener('click', event => {
+    if (event.target === elements.artModal) closeModal();
+  });
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') closeModal();
   });
-
-  elements.artistEmailLink.href = `mailto:${SITE.contact.email}`;
-  elements.artistEmailLink.textContent = SITE.contact.email;
-  elements.artistNameValue.textContent = `${SITE.contact.artistName} — ${SITE.contact.nickname}`;
-  elements.genericInquiryBtn.href = `mailto:${SITE.contact.email}?subject=${encodeURIComponent('Inquiry / Upit')}`;
+  document.querySelectorAll('.topbar-nav a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.topbar-nav a').forEach(item => item.classList.remove('is-active'));
+      link.classList.add('is-active');
+    });
+  });
 }
 
-function t(key, ...args) {
-  const pack = translations[state.lang] || translations.sr;
-  const value = pack[key];
-  return typeof value === 'function' ? value(...args) : value ?? key;
+async function loadRemoteSiteConfiguration() {
+  if (!db) return;
+  await Promise.all([loadRemoteSiteContent(), loadRemoteCategories()]);
+}
+
+async function loadRemoteSiteContent() {
+  try {
+    const doc = await db.collection(SITE.siteSettingsCollectionName || 'siteSettings').doc(SITE.siteSettingsDocumentId || 'main').get();
+    if (doc.exists) {
+      state.siteContent = { ...state.siteContent, ...cleanObject(doc.data() || {}) };
+    }
+  } catch (error) {
+    console.warn('Site settings loading warning:', error.message);
+  }
+}
+
+async function loadRemoteCategories() {
+  try {
+    const snapshot = await db.collection(SITE.categoryCollectionName || 'categories').get();
+    const remote = snapshot.docs.map(doc => normalizeCategory({ id: doc.id, ...(doc.data() || {}) })).filter(Boolean);
+    if (remote.length) state.categories = normalizeCategories(remote);
+  } catch (error) {
+    console.warn('Category loading warning:', error.message);
+  }
 }
 
 function applyLanguage() {
   document.documentElement.lang = state.lang === 'sr' ? 'sr' : 'en';
-  document.querySelectorAll('[data-i18n]').forEach(node => {
-    node.innerHTML = t(node.dataset.i18n);
+  document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+    btn.classList.toggle('is-active', btn.dataset.langBtn === state.lang);
   });
-
-  elements.searchInput.placeholder = t('searchPlaceholder');
-  rewriteStaticSelectOptions();
-  updateGalleryInfo();
+  document.querySelectorAll('[data-i18n]').forEach(node => {
+    const key = node.dataset.i18n;
+    const value = t(key);
+    if (typeof value === 'string') node.innerHTML = value;
+  });
+  if (elements.searchInput) elements.searchInput.placeholder = t('searchPlaceholder');
+  if (elements.statusFilter) {
+    elements.statusFilter.innerHTML = [
+      `<option value="all">${t('filterAllStatuses')}</option>`,
+      `<option value="available">${t('filterAvailable')}</option>`,
+      `<option value="reserved">${t('filterReserved')}</option>`,
+      `<option value="sold">${t('filterSold')}</option>`
+    ].join('');
+    elements.statusFilter.value = state.status;
+  }
+  if (elements.sortFilter) {
+    elements.sortFilter.innerHTML = [
+      `<option value="date-desc">${t('sortDateDesc')}</option>`,
+      `<option value="date-asc">${t('sortDateAsc')}</option>`,
+      `<option value="price-asc">${t('sortPriceAsc')}</option>`,
+      `<option value="price-desc">${t('sortPriceDesc')}</option>`,
+      `<option value="title-asc">${t('sortTitleAsc')}</option>`
+    ].join('');
+    elements.sortFilter.value = state.sort;
+  }
 }
 
-function rewriteStaticSelectOptions() {
-  elements.statusFilter.innerHTML = [
-    `<option value="all">${t('filterAllStatuses')}</option>`,
-    `<option value="available">${t('filterAvailable')}</option>`,
-    `<option value="reserved">${t('filterReserved')}</option>`,
-    `<option value="sold">${t('filterSold')}</option>`
-  ].join('');
-  elements.statusFilter.value = state.status;
+function applySiteContent() {
+  const content = state.siteContent || {};
+  const artistName = content.artistName || SITE.contact?.artistName || 'Никола Гаћеша';
+  const nickname = content.nickname || SITE.contact?.nickname || 'Кете';
+  const email = content.email || SITE.contact?.email || 'keteart@gmail.com';
+  const heroLead = pickLang(content.heroLeadSr, content.heroLeadEn);
+  const about = pickLang(content.aboutSr, content.aboutEn);
+  const prints = pickLang(content.printsSr, content.printsEn);
+  const contactLead = pickLang(content.contactLeadSr, content.contactLeadEn);
 
-  elements.sortFilter.innerHTML = [
-    `<option value="date-desc">${t('sortDateDesc')}</option>`,
-    `<option value="date-asc">${t('sortDateAsc')}</option>`,
-    `<option value="price-asc">${t('sortPriceAsc')}</option>`,
-    `<option value="price-desc">${t('sortPriceDesc')}</option>`,
-    `<option value="title-asc">${t('sortTitleAsc')}</option>`
-  ].join('');
-  elements.sortFilter.value = state.sort;
+  if (elements.dynamicHeroLead) elements.dynamicHeroLead.textContent = heroLead;
+  if (elements.dynamicAboutText) elements.dynamicAboutText.textContent = about;
+  if (elements.dynamicPrintsText) elements.dynamicPrintsText.textContent = prints;
+  if (elements.contactPrintsText) elements.contactPrintsText.textContent = prints;
+  if (elements.modalPrintText) elements.modalPrintText.textContent = prints;
+  if (elements.dynamicContactLead) elements.dynamicContactLead.textContent = contactLead;
+  if (elements.artistNameValue) elements.artistNameValue.textContent = `${artistName} — ${nickname}`;
+  if (elements.artistEmailLink) {
+    elements.artistEmailLink.href = `mailto:${email}`;
+    elements.artistEmailLink.textContent = email;
+  }
+  if (elements.genericInquiryBtn) {
+    elements.genericInquiryBtn.href = buildGeneralInquiryHref();
+  }
+  renderSocialLinks(content.socialLinks || '');
+}
+
+function renderSocialLinks(rawLinks) {
+  if (!elements.dynamicSocialLinks) return;
+  const links = String(rawLinks || '').split('\n').map(item => item.trim()).filter(Boolean);
+  if (!links.length) {
+    elements.dynamicSocialLinks.innerHTML = '';
+    return;
+  }
+  elements.dynamicSocialLinks.innerHTML = links.map(link => {
+    const safe = escapeHtml(link);
+    const href = /^https?:\/\//i.test(link) ? link : `https://${link}`;
+    return `<a class="tag" href="${escapeHtml(href)}" target="_blank" rel="noopener">${safe}</a>`;
+  }).join('');
 }
 
 async function loadArtworks() {
   if (!db) {
-    renderError('Firebase is not initialized.');
+    renderError('Firebase није учитан. Проверити firebase-config.js и интернет конекцију.');
     return;
   }
-
   elements.gallery.innerHTML = `<div class="empty-state">${t('loading')}</div>`;
-
   try {
-    const snapshot = await db.collection(SITE.collectionName).orderBy('createdAt', 'desc').get();
-    state.artworks = snapshot.docs.map(doc => normalizeArtwork(doc));
-    populateCategoryFilter();
+    const snapshot = await db.collection(SITE.collectionName || 'artworks').get();
+    state.artworks = snapshot.docs.map(doc => normalizeArtwork(doc)).sort((a, b) => b.createdAtMs - a.createdAtMs);
     updateStats();
+    populateCategoryFilter();
     applyFilters();
   } catch (error) {
     console.error(error);
-    renderError(t('loadError'));
+    renderError(`${t('loadError')} ${error.message}`);
   }
 }
 
 function normalizeArtwork(doc) {
   const data = doc.data() || {};
-  const category = normalizeCategory(data.category);
-  const createdAtMs = data.createdAt?.toMillis ? data.createdAt.toMillis() : 0;
+  const categoryKeys = new Set(state.categories.map(item => item.key));
   return {
     id: doc.id,
     title: data.title || 'Без назива',
     titleEn: data.titleEn || data.title || 'Untitled',
+    price: Number.isFinite(Number(data.price)) ? Number(data.price) : null,
+    status: ['available','reserved','sold'].includes(data.status) ? data.status : 'available',
+    technique: data.technique || '',
+    techniqueEn: data.techniqueEn || data.technique || '',
+    dimensions: data.dimensions || '',
+    year: data.year || '',
     description: data.description || '',
     descriptionEn: data.descriptionEn || data.description || '',
-    technique: data.technique || 'Непознато',
-    techniqueEn: data.techniqueEn || data.technique || 'Unknown',
-    dimensions: data.dimensions || 'Непознато',
-    year: data.year || '',
-    price: Number.isFinite(Number(data.price)) ? Number(data.price) : null,
-    status: STATUS_META[data.status] ? data.status : 'available',
-    category,
+    category: categoryKeys.has(data.category) ? data.category : 'other',
     imageUrl: data.imageUrl || '',
-    createdAtMs,
-    imagePath: data.imagePath || ''
+    imagePath: data.imagePath || '',
+    createdAtMs: data.createdAt?.toMillis ? data.createdAt.toMillis() : 0,
+    updatedAtMs: data.updatedAt?.toMillis ? data.updatedAt.toMillis() : 0
   };
 }
 
-function normalizeCategory(value) {
-  if (!value || !CATEGORY_LOOKUP.has(value)) return 'other';
-  return value;
+function normalizeCategories(list) {
+  const seen = new Set();
+  const normalized = (list || []).map(item => normalizeCategory(item)).filter(Boolean).filter(item => {
+    if (seen.has(item.key)) return false;
+    seen.add(item.key);
+    return true;
+  });
+  if (!normalized.some(item => item.key === 'other')) {
+    normalized.push(normalizeCategory({ key: 'other', sr: 'Остало', en: 'Other', order: 999, visible: true }));
+  }
+  return normalized.sort((a, b) => (Number(a.order) || 999) - (Number(b.order) || 999) || a.sr.localeCompare(b.sr, 'sr'));
 }
 
-function getCategoryLabel(key) {
-  const item = CATEGORY_LOOKUP.get(key) || CATEGORY_LOOKUP.get('other');
-  return state.lang === 'sr' ? item.sr : item.en;
+function normalizeCategory(item) {
+  if (!item) return null;
+  const key = slugify(item.key || item.id || item.sr || item.en || 'other');
+  if (!key) return null;
+  return {
+    id: item.id || key,
+    key,
+    sr: item.sr || item.nameSr || item.titleSr || key,
+    en: item.en || item.nameEn || item.titleEn || item.sr || key,
+    descriptionSr: item.descriptionSr || item.description || '',
+    descriptionEn: item.descriptionEn || item.descriptionSr || item.description || '',
+    legacyTextSr: item.legacyTextSr || '',
+    legacyTextEn: item.legacyTextEn || item.legacyTextSr || '',
+    order: Number.isFinite(Number(item.order)) ? Number(item.order) : 999,
+    visible: item.visible !== false
+  };
+}
+
+function slugify(value) {
+  const map = { 'а':'a','б':'b','в':'v','г':'g','д':'d','ђ':'dj','е':'e','ж':'z','з':'z','и':'i','ј':'j','к':'k','л':'l','љ':'lj','м':'m','н':'n','њ':'nj','о':'o','п':'p','р':'r','с':'s','т':'t','ћ':'c','у':'u','ф':'f','х':'h','ц':'c','ч':'c','џ':'dz','ш':'s' };
+  return String(value || '').trim().toLowerCase().split('').map(ch => map[ch] || ch).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'other';
+}
+
+function t(key, ...args) {
+  const table = translations[state.lang] || translations.sr;
+  const value = table[key] ?? translations.sr[key] ?? key;
+  return typeof value === 'function' ? value(...args) : value;
+}
+
+function pickLang(srValue, enValue) {
+  return state.lang === 'sr' ? (srValue || enValue || '') : (enValue || srValue || '');
+}
+
+function cleanObject(obj) {
+  return Object.fromEntries(Object.entries(obj).filter(([, value]) => value !== undefined && value !== null));
 }
 
 function getStatusLabel(status) {
   return STATUS_META[status]?.[state.lang] || STATUS_META.available[state.lang];
+}
+
+function getCategoryItem(key) {
+  return state.categories.find(item => item.key === key) || state.categories.find(item => item.key === 'other') || { key: 'other', sr: 'Остало', en: 'Other' };
+}
+
+function getCategoryLabel(key) {
+  const item = getCategoryItem(key);
+  return state.lang === 'sr' ? item.sr : item.en;
 }
 
 function getPriceLabel(price) {
@@ -379,56 +460,17 @@ function getPriceLabel(price) {
 
 function renderCategoryCards() {
   if (!elements.categoryCards) return;
-  const descriptions = {
-    'old-works': {
-      sr: 'Архива старијих циклуса и радова који су чинили окосницу старог портфолија.',
-      en: 'An archive of older cycles and artworks that formed the core of the original portfolio.'
-    },
-    'new-drawings-paintings': {
-      sr: 'Новији радови, слике и цртежи представљени као савремени наставак опуса.',
-      en: 'More recent drawings and paintings presented as a contemporary continuation of the opus.'
-    },
-    faces: {
-      sr: 'Портрети и ликови, са нагласком на карактер и израз.',
-      en: 'Portraits and faces with emphasis on character and expression.'
-    },
-    ink: {
-      sr: 'Туш, линија и црно-бела дисциплина цртежа.',
-      en: 'Ink works focused on line, contrast and monochrome discipline.'
-    },
-    'ballpoint-pen': {
-      sr: 'Радови у хемијској оловци, прецизни и стрпљиво грађени.',
-      en: 'Ballpoint pen works built through precision and patience.'
-    },
-    graphics: {
-      sr: 'Графички радови и отисци, са јасном ауторском естетиком.',
-      en: 'Graphic works and prints shaped by a distinct authorial aesthetic.'
-    },
-    sculptures: {
-      sr: 'Вајарски радови и тродимензионалне форме.',
-      en: 'Sculptural works and three-dimensional forms.'
-    },
-    photographs: {
-      sr: 'Фотографије као део ширег визуелног архива.',
-      en: 'Photographs as part of a broader visual archive.'
-    },
-    drawings: {
-      sr: 'Цртежи као темељ уметничког израза и рукописа.',
-      en: 'Drawings as the foundation of artistic expression and signature.'
-    },
-    other: {
-      sr: 'Радови који још нису сврстани у једну од главних старих категорија.',
-      en: 'Works not yet placed into one of the main legacy categories.'
-    }
-  };
-
-  elements.categoryCards.innerHTML = SITE.categories.map(item => {
-    const desc = descriptions[item.key]?.[state.lang] || '';
+  const visible = state.categories.filter(item => item.visible !== false);
+  elements.categoryCards.innerHTML = visible.map(item => {
+    const title = state.lang === 'sr' ? item.sr : item.en;
+    const desc = pickLang(item.descriptionSr, item.descriptionEn);
+    const legacy = pickLang(item.legacyTextSr, item.legacyTextEn);
     return `
       <article class="category-card">
-        <h3>${state.lang === 'sr' ? item.sr : item.en}</h3>
-        <p>${desc}</p>
-        <button class="tag" type="button" data-category-chip="${item.key}">${state.lang === 'sr' ? 'Филтрирај категорију' : 'Filter category'}</button>
+        <h3>${escapeHtml(title)}</h3>
+        ${desc ? `<p>${escapeHtml(desc)}</p>` : ''}
+        ${legacy ? `<p class="small muted"><strong>${escapeHtml(t('legacyLabel'))}</strong> ${escapeHtml(legacy)}</p>` : ''}
+        <button class="tag" type="button" data-category-chip="${escapeHtml(item.key)}">${escapeHtml(t('filterCategory'))}</button>
       </article>
     `;
   }).join('');
@@ -444,16 +486,18 @@ function renderCategoryCards() {
 }
 
 function populateCategoryFilter() {
+  if (!elements.categoryFilter) return;
   const usedCategories = new Set(state.artworks.map(item => item.category));
-  const list = SITE.categories.filter(item => item.key === 'other' || usedCategories.has(item.key));
+  const list = state.categories.filter(item => item.visible !== false && (usedCategories.has(item.key) || item.key === 'other'));
   const options = [`<option value="all">${t('filterAllCategories')}</option>`].concat(
-    list.map(item => `<option value="${item.key}">${state.lang === 'sr' ? item.sr : item.en}</option>`)
+    list.map(item => `<option value="${escapeHtml(item.key)}">${escapeHtml(state.lang === 'sr' ? item.sr : item.en)}</option>`)
   );
   elements.categoryFilter.innerHTML = options.join('');
   elements.categoryFilter.value = state.category;
 }
 
 function renderQuickChips() {
+  if (!elements.quickStatusChips) return;
   const chips = [
     { value: 'all', label: t('chipAll') },
     { value: 'available', label: t('filterAvailable') },
@@ -462,7 +506,7 @@ function renderQuickChips() {
   ];
 
   elements.quickStatusChips.innerHTML = chips.map(chip => `
-    <button type="button" class="filter-chip ${state.quickStatus === chip.value ? 'is-active' : ''}" data-quick-status="${chip.value}">${chip.label}</button>
+    <button type="button" class="filter-chip ${state.quickStatus === chip.value ? 'is-active' : ''}" data-quick-status="${chip.value}">${escapeHtml(chip.label)}</button>
   `).join('');
 
   elements.quickStatusChips.querySelectorAll('[data-quick-status]').forEach(btn => {
@@ -477,25 +521,21 @@ function renderQuickChips() {
 }
 
 function applyFilters() {
-  const term = state.search;
   let list = [...state.artworks];
+  const visibleCategories = new Set(state.categories.filter(item => item.visible !== false).map(item => item.key));
 
-  if (state.status !== 'all') {
-    list = list.filter(item => item.status === state.status);
-  }
+  list = list.filter(item => visibleCategories.has(item.category));
 
-  if (state.category !== 'all') {
-    list = list.filter(item => item.category === state.category);
-  }
+  if (state.status !== 'all') list = list.filter(item => item.status === state.status);
+  if (state.category !== 'all') list = list.filter(item => item.category === state.category);
 
-  if (term) {
+  if (state.search) {
     list = list.filter(item => {
       const haystack = [
         item.title, item.titleEn, item.description, item.descriptionEn,
-        item.technique, item.techniqueEn, item.dimensions,
-        getCategoryLabel(item.category)
+        item.technique, item.techniqueEn, item.dimensions, getCategoryLabel(item.category)
       ].join(' ').toLowerCase();
-      return haystack.includes(term);
+      return haystack.includes(state.search);
     });
   }
 
@@ -506,21 +546,17 @@ function applyFilters() {
 
 function sortArtworks(a, b) {
   switch (state.sort) {
-    case 'date-asc':
-      return a.createdAtMs - b.createdAtMs;
-    case 'price-asc':
-      return (a.price ?? Number.MAX_SAFE_INTEGER) - (b.price ?? Number.MAX_SAFE_INTEGER);
-    case 'price-desc':
-      return (b.price ?? -1) - (a.price ?? -1);
-    case 'title-asc':
-      return (state.lang === 'sr' ? a.title : a.titleEn).localeCompare(state.lang === 'sr' ? b.title : b.titleEn, state.lang === 'sr' ? 'sr' : 'en');
+    case 'date-asc': return a.createdAtMs - b.createdAtMs;
+    case 'price-asc': return (a.price ?? Number.MAX_SAFE_INTEGER) - (b.price ?? Number.MAX_SAFE_INTEGER);
+    case 'price-desc': return (b.price ?? -1) - (a.price ?? -1);
+    case 'title-asc': return (state.lang === 'sr' ? a.title : a.titleEn).localeCompare(state.lang === 'sr' ? b.title : b.titleEn, state.lang === 'sr' ? 'sr' : 'en');
     case 'date-desc':
-    default:
-      return b.createdAtMs - a.createdAtMs;
+    default: return b.createdAtMs - a.createdAtMs;
   }
 }
 
 function renderGallery() {
+  if (!elements.gallery) return;
   if (!state.filtered.length) {
     elements.gallery.innerHTML = `<div class="empty-state">${t('emptyState')}</div>`;
     updateGalleryInfo();
@@ -528,14 +564,14 @@ function renderGallery() {
   }
 
   elements.gallery.innerHTML = state.filtered.map(art => {
-    const status = STATUS_META[art.status];
+    const status = STATUS_META[art.status] || STATUS_META.available;
     const title = state.lang === 'sr' ? art.title : art.titleEn;
     const technique = state.lang === 'sr' ? art.technique : art.techniqueEn;
     const description = state.lang === 'sr' ? art.description : art.descriptionEn;
     return `
-      <article class="art-card" data-art-id="${art.id}">
+      <article class="art-card" data-art-id="${escapeHtml(art.id)}">
         <div class="art-media">
-          ${art.imageUrl ? `<img src="${escapeHtml(art.imageUrl)}" alt="${escapeHtml(title)}" loading="lazy">` : ''}
+          ${art.imageUrl ? `<img src="${escapeHtml(art.imageUrl)}" alt="${escapeHtml(title)}" loading="lazy">` : '<div class="empty-media">Без слике</div>'}
         </div>
         <div class="art-body">
           <div class="art-meta" style="margin-bottom:8px;">
@@ -545,14 +581,14 @@ function renderGallery() {
           <h3>${escapeHtml(title)}</h3>
           <div class="price">${escapeHtml(getPriceLabel(art.price))}</div>
           <div class="art-meta" style="margin:10px 0 12px;">
-            <span>${escapeHtml(technique)}</span>
+            <span>${escapeHtml(technique || '—')}</span>
             <span>•</span>
-            <span>${escapeHtml(art.dimensions || '')}</span>
+            <span>${escapeHtml(art.dimensions || '—')}</span>
             ${art.year ? `<span>•</span><span>${escapeHtml(String(art.year))}</span>` : ''}
           </div>
           <p class="muted small">${escapeHtml(truncate(description || '', 120))}</p>
           <div class="inline-actions" style="margin-top:14px;">
-            <button type="button" class="btn" data-open-art="${art.id}">${state.lang === 'sr' ? 'Детаљи' : 'Details'}</button>
+            <button type="button" class="btn" data-open-art="${escapeHtml(art.id)}">${state.lang === 'sr' ? 'Детаљи' : 'Details'}</button>
             <a class="btn secondary" href="${buildInquiryHref(art)}">${state.lang === 'sr' ? 'Упит' : 'Inquiry'}</a>
           </div>
         </div>
@@ -566,7 +602,6 @@ function renderGallery() {
       if (art) openModal(art);
     });
   });
-
   updateGalleryInfo();
 }
 
@@ -578,6 +613,7 @@ function updateGalleryInfo() {
 }
 
 function updateStats() {
+  if (!elements.statTotal) return;
   elements.statTotal.textContent = String(state.artworks.length);
   elements.statAvailable.textContent = String(state.artworks.filter(item => item.status === 'available').length);
   elements.statReserved.textContent = String(state.artworks.filter(item => item.status === 'reserved').length);
@@ -592,33 +628,44 @@ function openModal(art) {
   elements.modalImage.alt = title;
   elements.modalCategory.textContent = getCategoryLabel(art.category);
   elements.modalStatus.textContent = getStatusLabel(art.status);
-  elements.modalStatus.className = `badge ${STATUS_META[art.status].cls}`;
+  elements.modalStatus.className = `badge ${(STATUS_META[art.status] || STATUS_META.available).cls}`;
   elements.modalTitle.textContent = title;
   elements.modalPrice.textContent = getPriceLabel(art.price);
-  elements.modalTechniqueValue.textContent = technique;
+  elements.modalTechniqueValue.textContent = technique || '—';
   elements.modalDimensionsValue.textContent = art.dimensions || '—';
   elements.modalYearValue.textContent = art.year || '—';
   elements.modalDescription.textContent = desc || '';
   elements.modalInquiryBtn.href = buildInquiryHref(art);
-  elements.modal.classList.add('open');
-  elements.modal.setAttribute('aria-hidden', 'false');
+  elements.artModal.classList.add('open');
+  elements.artModal.setAttribute('aria-hidden', 'false');
 }
 
 function closeModal() {
-  elements.modal.classList.remove('open');
-  elements.modal.setAttribute('aria-hidden', 'true');
+  elements.artModal.classList.remove('open');
+  elements.artModal.setAttribute('aria-hidden', 'true');
 }
 
 function buildInquiryHref(art) {
   const title = state.lang === 'sr' ? art.title : art.titleEn;
+  const email = state.siteContent.email || SITE.contact?.email || 'keteart@gmail.com';
   const subject = t('inquirySubject', title);
   const body = t('inquiryBody', title);
-  return `mailto:${SITE.contact.email}?subject=${encodeURIComponent(subject)}&body=${body}`;
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function buildGeneralInquiryHref() {
+  const email = state.siteContent.email || SITE.contact?.email || 'keteart@gmail.com';
+  const subject = state.lang === 'sr' ? 'Општи упит за уметничко дело' : 'General artwork inquiry';
+  const body = state.lang === 'sr'
+    ? 'Поштовање,\n\nинтересују ме радови Николе Гаћеше. Молим Вас за више информација о доступним радовима, ценама и принтовима на платну.\n\nХвала.'
+    : 'Hello,\n\nI am interested in Nikola Gacesa’s artworks. Please send me more information about available works, prices and canvas prints.\n\nThank you.';
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function renderError(message) {
+  if (!elements.gallery) return;
   elements.gallery.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
-  elements.galleryInfo.textContent = '';
+  if (elements.galleryInfo) elements.galleryInfo.textContent = '';
 }
 
 function truncate(text, maxLen) {

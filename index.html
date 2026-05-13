@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Никола Гаћеша | Уметничка галерија</title>
-  <meta name="description" content="Уметничка галерија Николе Гаћеше — радови, категорије, детаљи дела и контакт за куповину или наручивање принтова на платну.">
-  <meta property="og:title" content="Никола Гаћеша | Уметничка галерија">
-  <meta property="og:description" content="Модеран уметнички сајт који задржава структуру старог портфолија: почетна, радови по категоријама и контакт.">
+  <title>Никола Гаћеша | Kete Art</title>
+  <meta name="description" content="Уметничка галерија Николе Гаћеше — радови, категорије, детаљи дела, цене, доступност и контакт за куповину или принтове на платну.">
+  <meta property="og:title" content="Никола Гаћеша | Kete Art">
+  <meta property="og:description" content="Модеран уметнички сајт са динамичком галеријом, категоријама и админ панелом за управљање радовима.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -42,9 +42,8 @@
         <div>
           <div class="eyebrow" data-i18n="eyebrow">портфолио + продаја + архивa радова</div>
           <h1 data-i18n="heroTitle">Никола Гаћеша<br>Кете</h1>
-          <p class="lead" data-i18n="heroLead">
-            Академски сликар из Србије. Сајт спаја атмосферу старог портфолија са модерном галеријом, прегледом радова,
-            категоријама и директним упитом за куповину.
+          <p class="lead" id="dynamicHeroLead">
+            Моје име је Никола Гаћеша, надимак Кете. Рођен сам 1982. године у Србији. Академски сам сликар, ако је то уопште важно. Овај нови сајт задржава дух старог портфолија, али додаје модерну галерију, категорије, цене, статусе доступности и директан контакт за куповину.
           </p>
           <div class="hero-actions" style="margin-top:18px;">
             <a class="btn" href="#works" data-i18n="heroPrimary">Погледај радове</a>
@@ -102,7 +101,7 @@
       <div class="section-header">
         <div>
           <h2 class="section-title" data-i18n="catTitle">Категорије из старог сајта</h2>
-          <p data-i18n="catLead">Структура старог WordPress сајта је задржана и претворена у прегледнији систем категорија. Сваки нови рад из админа може одмах да се веже за одговарајућу категорију.</p>
+          <p data-i18n="catLead">Структура старог WordPress сајта је задржана и претворена у прегледнији систем категорија. Свака категорија може да се мења у админ панелу.</p>
         </div>
       </div>
       <div class="category-grid" id="categoryCards"></div>
@@ -112,7 +111,7 @@
       <div class="section-header">
         <div>
           <h2 class="section-title" data-i18n="worksTitle">Радови</h2>
-          <p data-i18n="worksLead">Јавни део сад приказује динамичку галерију из Firebase-а, уз претрагу, филтере, категорије и јасне статусе доступности.</p>
+          <p data-i18n="worksLead">Јавни део приказује динамичку галерију из Firebase-а, уз претрагу, филтере, категорије, цене и јасне статусе доступности.</p>
         </div>
       </div>
 
@@ -160,18 +159,15 @@
       <div class="contact-grid">
         <article class="contact-card">
           <h3 data-i18n="aboutCardTitle">Биографија</h3>
-          <div class="info-list">
-            <div class="info-item"><span>•</span><div data-i18n="aboutBio1">Моје име је Никола Гаћеша, надимак Кете. Рођен сам 1982. године у Србији.</div></div>
-            <div class="info-item"><span>•</span><div data-i18n="aboutBio2">Академски сам сликар и имам више самосталних и групних изложби.</div></div>
-            <div class="info-item"><span>•</span><div data-i18n="aboutBio3">Овде је спојен класичан портфолио и функционалан јавни каталог за преглед, упит и продају.</div></div>
-          </div>
+          <p class="section-lead" id="dynamicAboutText">Ово је јавни уметнички каталог Николе Гаћеше – Кетеа. Посетилац може да прегледа радове по категоријама, да види да ли је рад доступан, резервисан или продат, и да пошаље упит за оригинал или принт.</p>
+          <p class="section-lead" id="dynamicPrintsText" style="margin-top:14px;">СВИ РАДОВИ СУ ДОСТУПНИ У ВИДУ ПРИНТА НА ПЛАТНУ. За оригинале, цене, резервације и принтове најбоље је послати директан упит.</p>
         </article>
         <article class="contact-card">
           <h3 data-i18n="aboutSecondTitle">Шта је ново у односу на стари сајт</h3>
           <div class="info-list">
             <div class="info-item"><span>•</span><div data-i18n="aboutFeat1">Бржа галерија са претрагом, сортирањем и бољим мобилним приказом.</div></div>
             <div class="info-item"><span>•</span><div data-i18n="aboutFeat2">Јасни статуси: доступно, резервисано и продато.</div></div>
-            <div class="info-item"><span>•</span><div data-i18n="aboutFeat3">Један админ панел за додавање, измену, брисање, bulk промене и извоз података.</div></div>
+            <div class="info-item"><span>•</span><div data-i18n="aboutFeat3">Један админ панел за додавање, измену, брисање, bulk промене, извоз, текстове и категорије.</div></div>
           </div>
         </article>
       </div>
@@ -181,7 +177,7 @@
       <div class="section-header">
         <div>
           <h2 class="section-title" data-i18n="contactTitle">Контакт и упит за куповину</h2>
-          <p data-i18n="contactLead">Стара контакт страница је била задржана као важан део сајта. Овде је претворена у јаснији, продајно употребљив блок.</p>
+          <p id="dynamicContactLead">Контакт страница старог сајта је задржана као важан део новог сајта: име уметника, надимак, email, друштвене мреже и напомена о принтовима.</p>
         </div>
       </div>
       <div class="contact-grid">
@@ -190,8 +186,9 @@
           <div class="contact-list">
             <div class="contact-item"><span>✉️</span><div><strong data-i18n="contactEmailLabel">Електронска пошта</strong><br><a id="artistEmailLink" href="mailto:keteart@gmail.com">keteart@gmail.com</a></div></div>
             <div class="contact-item"><span>👤</span><div><strong data-i18n="contactArtistLabel">Уметник</strong><br><span id="artistNameValue">Никола Гаћеша — Кете</span></div></div>
-            <div class="contact-item"><span>🖨️</span><div><strong data-i18n="contactPrintsLabel">Принтови</strong><br><span data-i18n="contactPrintsText">Сви радови могу бити понуђени и као принт на платну.</span></div></div>
+            <div class="contact-item"><span>🖨️</span><div><strong data-i18n="contactPrintsLabel">Принтови</strong><br><span id="contactPrintsText">Доступни као принтови на платну.</span></div></div>
           </div>
+          <div class="inline-actions" id="dynamicSocialLinks" style="margin-top:16px;"></div>
         </article>
         <article class="contact-card">
           <h3 data-i18n="contactCard2Title">Брзи упит</h3>
@@ -225,7 +222,7 @@
             <div><strong data-i18n="modalTechnique">Техника:</strong> <span id="modalTechniqueValue"></span></div>
             <div><strong data-i18n="modalDimensions">Димензије:</strong> <span id="modalDimensionsValue"></span></div>
             <div><strong data-i18n="modalYear">Година:</strong> <span id="modalYearValue"></span></div>
-            <div><strong data-i18n="modalPrint">Принт:</strong> <span data-i18n="modalPrintValue">Доступан и као принт на платну</span></div>
+            <div><strong data-i18n="modalPrint">Принт:</strong> <span id="modalPrintText">Доступан и као принт на платну</span></div>
           </div>
           <p id="modalDescription" class="section-lead"></p>
           <div class="inline-actions" style="margin-top:18px;">

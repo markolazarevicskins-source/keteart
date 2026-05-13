@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Админ панел | Никола Гаћеша</title>
-  <meta name="description" content="Админ панел за управљање радовима у галерији Николе Гаћеше.">
+  <meta name="description" content="Админ панел за управљање радовима, ценама, категоријама, галеријама и јавним текстовима сајта Николе Гаћеше.">
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -19,20 +19,22 @@
         <div class="brand-mark">⚙️</div>
         <div>
           <div class="brand-title">Админ панел — Никола Гаћеша</div>
-          <div class="brand-subtitle">додавање, измена, брисање, bulk акције и извоз</div>
+          <div class="brand-subtitle">радови, цене, категорије, галерије и јавни текстови</div>
         </div>
       </div>
       <nav class="topbar-nav" aria-label="Навигација">
         <a href="index.html">Јавни сајт</a>
         <a href="#loginSection">Пријава</a>
         <a href="#adminSection">Радови</a>
+        <a href="#categorySection">Галерије</a>
+        <a href="#contentSection">Текстови</a>
       </nav>
     </header>
 
     <section class="section glass auth-layout" id="loginSection">
       <article class="auth-card">
         <h2>🔐 Пријава</h2>
-        <p class="section-lead">Пријави се Firebase налогом да би отворио админ панел и управљао радовима.</p>
+        <p class="section-lead">Пријави се Firebase налогом да би отворио админ панел и управљао целим јавним сајтом.</p>
         <div class="form-grid" style="margin-top:16px;">
           <div class="full">
             <label class="small muted" for="loginEmail">Email</label>
@@ -51,12 +53,13 @@
       </article>
 
       <article class="auth-card">
-        <h2>🧭 Шта овај панел сада ради</h2>
+        <h2>🧭 Шта овај панел ради</h2>
         <div class="info-list">
-          <div class="info-item"><span>•</span><div>Додавање новог рада са сликом, двојезичним насловом и описом, ценом, статусом и категоријом.</div></div>
-          <div class="info-item"><span>•</span><div>Измена постојећег рада без брисања старог уноса.</div></div>
-          <div class="info-item"><span>•</span><div>Bulk промена статуса, JSON и CSV извоз, претрага и филтери.</div></div>
-          <div class="info-item"><span>•</span><div>Брисање из Firestore-а и покушај брисања слике из Storage-а ако је сачувана путања.</div></div>
+          <div class="info-item"><span>•</span><div>Додавање, измена и брисање радова са сликама, ценама, описима, техникама, димензијама и статусима.</div></div>
+          <div class="info-item"><span>•</span><div>Промена цена и статуса појединачно или групно: доступно, резервисано, продато.</div></div>
+          <div class="info-item"><span>•</span><div>Управљање галеријама/категоријама: назив, опис, редослед, видљивост и стари текстови са старог сајта.</div></div>
+          <div class="info-item"><span>•</span><div>Управљање јавним текстом, контакт email-ом, напоменом о принтовима и друштвеним линковима.</div></div>
+          <div class="info-item"><span>•</span><div>JSON/CSV извоз радова као резервна копија.</div></div>
         </div>
       </article>
     </section>
@@ -64,8 +67,8 @@
     <section class="section glass hidden" id="adminSection">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Управљање галеријом</h2>
-          <p>Нови радови могу да користе структуру старог сајта, али са модернијим моделом података и јавним филтерима.</p>
+          <h2 class="section-title">Управљање радовима</h2>
+          <p>Овде Никола додаје нови рад, мења цену, статус, слику, опис, категорију или брише рад са сајта.</p>
         </div>
       </div>
 
@@ -108,7 +111,7 @@
               <input id="artYear" class="input" type="number" min="1900" max="2100" placeholder="2026">
             </div>
             <div>
-              <label class="small muted" for="artCategory">Категорија</label>
+              <label class="small muted" for="artCategory">Галерија / категорија</label>
               <select id="artCategory" class="select"></select>
             </div>
             <div>
@@ -189,6 +192,139 @@
           <div class="admin-gallery" id="adminGallery" style="margin-top:16px;"></div>
         </article>
       </div>
+    </section>
+
+    <section class="section glass hidden" id="categorySection">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Галерије и категорије</h2>
+          <p>Овде се мењају називи, описи, редослед и видљивост галерија. Ако галерија није видљива, јавни сајт је не приказује.</p>
+        </div>
+      </div>
+      <div class="admin-layout">
+        <article class="admin-card">
+          <h2 id="categoryFormTitle">➕ Додај галерију</h2>
+          <div class="form-grid">
+            <div>
+              <label class="small muted" for="categoryKey">Кључ</label>
+              <input id="categoryKey" class="input" type="text" placeholder="npr. portraits">
+            </div>
+            <div>
+              <label class="small muted" for="categoryOrder">Редослед</label>
+              <input id="categoryOrder" class="input" type="number" step="1" placeholder="10">
+            </div>
+            <div>
+              <label class="small muted" for="categorySr">Назив (SR)</label>
+              <input id="categorySr" class="input" type="text" placeholder="Портрети">
+            </div>
+            <div>
+              <label class="small muted" for="categoryEn">Title (EN)</label>
+              <input id="categoryEn" class="input" type="text" placeholder="Portraits">
+            </div>
+            <div class="full">
+              <label class="small muted" for="categoryDescriptionSr">Опис (SR)</label>
+              <textarea id="categoryDescriptionSr" class="textarea" placeholder="Кратак опис галерије"></textarea>
+            </div>
+            <div class="full">
+              <label class="small muted" for="categoryDescriptionEn">Description (EN)</label>
+              <textarea id="categoryDescriptionEn" class="textarea" placeholder="Short category description"></textarea>
+            </div>
+            <div class="full">
+              <label class="small muted" for="categoryLegacySr">Стари текст / називи радова (SR)</label>
+              <textarea id="categoryLegacySr" class="textarea" placeholder="Називи који су били видљиви на старом сајту"></textarea>
+            </div>
+            <div class="full">
+              <label class="small muted" for="categoryLegacyEn">Old text / artwork names (EN)</label>
+              <textarea id="categoryLegacyEn" class="textarea" placeholder="Old visible text or translated names"></textarea>
+            </div>
+            <div class="full check-line">
+              <input id="categoryVisible" type="checkbox" checked>
+              <label for="categoryVisible">Прикажи ову галерију на јавном сајту</label>
+            </div>
+          </div>
+          <div class="inline-actions" style="margin-top:16px;">
+            <button type="button" class="btn" id="saveCategoryBtn">Сачувај галерију</button>
+            <button type="button" class="btn secondary" id="resetCategoryBtn">Очисти</button>
+            <button type="button" class="btn secondary" id="seedCategoriesBtn">Упиши основне галерије</button>
+            <button type="button" class="btn danger hidden" id="cancelCategoryEditBtn">Поништи измену</button>
+          </div>
+          <div id="categoryMessage" class="notice" style="margin-top:16px;">Спремно за измену галерија.</div>
+        </article>
+        <article class="list-card">
+          <h2>📁 Списак галерија</h2>
+          <div id="categoryList" class="category-admin-list" style="margin-top:16px;"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section glass hidden" id="contentSection">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Јавни текстови и контакт</h2>
+          <p>Овде се мења текст који виде посетиоци: биографија, увод, принтови, контакт и друштвене мреже.</p>
+        </div>
+      </div>
+      <article class="admin-card">
+        <div class="form-grid">
+          <div>
+            <label class="small muted" for="contentArtistName">Име уметника</label>
+            <input id="contentArtistName" class="input" type="text">
+          </div>
+          <div>
+            <label class="small muted" for="contentNickname">Надимак</label>
+            <input id="contentNickname" class="input" type="text">
+          </div>
+          <div>
+            <label class="small muted" for="contentEmail">Email</label>
+            <input id="contentEmail" class="input" type="email">
+          </div>
+          <div>
+            <label class="small muted" for="contentSiteLabel">Ознака сајта</label>
+            <input id="contentSiteLabel" class="input" type="text">
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentHeroSr">Главни увод (SR)</label>
+            <textarea id="contentHeroSr" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentHeroEn">Main intro (EN)</label>
+            <textarea id="contentHeroEn" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentAboutSr">О уметнику (SR)</label>
+            <textarea id="contentAboutSr" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentAboutEn">About artist (EN)</label>
+            <textarea id="contentAboutEn" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentPrintsSr">Напомена о принтовима (SR)</label>
+            <textarea id="contentPrintsSr" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentPrintsEn">Print note (EN)</label>
+            <textarea id="contentPrintsEn" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentContactLeadSr">Контакт увод (SR)</label>
+            <textarea id="contentContactLeadSr" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentContactLeadEn">Contact intro (EN)</label>
+            <textarea id="contentContactLeadEn" class="textarea"></textarea>
+          </div>
+          <div class="full">
+            <label class="small muted" for="contentSocialLinks">Друштвене мреже / линкови, сваки у новом реду</label>
+            <textarea id="contentSocialLinks" class="textarea" placeholder="https://www.youtube.com/...&#10;https://www.instagram.com/..."></textarea>
+          </div>
+        </div>
+        <div class="inline-actions" style="margin-top:16px;">
+          <button type="button" class="btn" id="saveContentBtn">Сачувај јавни текст</button>
+          <button type="button" class="btn secondary" id="reloadContentBtn">Поново учитај</button>
+        </div>
+        <div id="contentMessage" class="notice" style="margin-top:16px;">Јавни текст је спреман.</div>
+      </article>
     </section>
   </div>
 
